@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-import type { ReactNode } from "react";
 import { AuthProvider } from "./context/AuthContext";
 
 const geistSans = Geist({
@@ -15,32 +14,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// ⭐ BEST GOOGLE VERIFICATION — AUTOMATIC HEAD INJECTION
 export const metadata: Metadata = {
   title: "Revive EcoTech",
   description: "Earn by recycling waste",
-
-  verification: {
-    google: "ADlb8HGH4MnniAFAryH0KHNuH_7EMyNZtTA_hGJAT18",
-  },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <head>
+        {/* 🔥 DIRECT GOOGLE META TAG (Guaranteed Detect) */}
+        <meta
+          name="google-site-verification"
+          content="ADlb8HGH4MnniAFAryH0KHNuH_7EMyNZtTA_hGJAT18"
+        />
+      </head>
 
-        {/* Firebase Recaptcha */}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div id="recaptcha-container"></div>
 
-        {/* Auth Provider */}
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
 
         <Analytics />
       </body>
