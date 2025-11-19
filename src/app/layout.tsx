@@ -15,9 +15,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// ⭐ BEST GOOGLE VERIFICATION — AUTOMATIC HEAD INJECTION
 export const metadata: Metadata = {
   title: "Revive EcoTech",
   description: "Earn by recycling waste",
+
+  verification: {
+    google: "ADlb8HGH4MnniAFAryH0KHNuH_7EMyNZtTA_hGJAT18",
+  },
 };
 
 export default function RootLayout({
@@ -29,10 +34,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 
-        {/* 🔥 IMPORTANT: Firebase Recaptcha container (MUST stay outside all components) */}
+        {/* Firebase Recaptcha */}
         <div id="recaptcha-container"></div>
 
-        {/* Auth Provider (if you want global authentication state) */}
+        {/* Auth Provider */}
         <AuthProvider>
           {children}
         </AuthProvider>
