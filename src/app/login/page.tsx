@@ -10,6 +10,7 @@ import {
   googleProvider,
   RecaptchaVerifier,
   signInWithPhoneNumber,
+  type ConfirmationResult, // <-- NEW: Import the necessary type
 } from "@/lib/firebase";
 
 import {
@@ -21,7 +22,8 @@ import {
 declare global {
   interface Window {
     recaptchaVerifier: RecaptchaVerifier;
-    confirmationResult: any; // Firebase ConfirmationResult type
+    // FIX: Replaced 'any' with the correct ConfirmationResult type
+    confirmationResult: ConfirmationResult; 
   }
 }
 
@@ -76,10 +78,9 @@ export default function Login() {
 
       window.confirmationResult = confirmation;
       setOtpSent(true);
-      // NOTE: Using a custom modal/toast is recommended instead of alert() in production.
       alert("OTP Sent Successfully!");
     } catch (err: unknown) {
-      // FIX: Replace 'any' with 'unknown' and narrow type
+      // Corrected error handling
       if (err instanceof Error) setError(err.message);
       else setError("OTP sending failed");
     }
@@ -92,10 +93,9 @@ export default function Login() {
     try {
       if (!otp) return setError("Enter OTP");
       await window.confirmationResult.confirm(otp);
-      // NOTE: Using a custom modal/toast is recommended instead of alert() in production.
       alert("Logged in Successfully!");
     } catch (err: unknown) {
-      // FIX: Replace 'any' with 'unknown' and narrow type
+      // Corrected error handling
       if (err instanceof Error) setError(err.message);
       else setError("Invalid OTP");
     }
@@ -108,10 +108,9 @@ export default function Login() {
     try {
       const auth = getAuthClient();
       await signInWithEmailAndPassword(auth, email, password);
-      // NOTE: Using a custom modal/toast is recommended instead of alert() in production.
       alert("Login Successful!");
     } catch (err: unknown) {
-      // FIX: Replace 'any' with 'unknown' and narrow type
+      // Corrected error handling
       if (err instanceof Error) setError(err.message);
       else setError("Something went wrong");
     }
@@ -124,10 +123,9 @@ export default function Login() {
     try {
       const auth = getAuthClient();
       await signInWithPopup(auth, googleProvider);
-      // NOTE: Using a custom modal/toast is recommended instead of alert() in production.
       alert("Logged in with Google!");
     } catch (err: unknown) {
-      // FIX: Replace 'any' with 'unknown' and narrow type
+      // Corrected error handling
       if (err instanceof Error) setError(err.message);
       else setError("Something went wrong");
     }
