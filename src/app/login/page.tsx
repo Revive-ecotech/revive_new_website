@@ -17,6 +17,14 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 
+// Define custom window properties for Firebase
+declare global {
+  interface Window {
+    recaptchaVerifier: RecaptchaVerifier;
+    confirmationResult: any; // Firebase ConfirmationResult type
+  }
+}
+
 export default function Login() {
   const [mode, setMode] = useState<"email" | "phone">("email");
 
@@ -68,9 +76,12 @@ export default function Login() {
 
       window.confirmationResult = confirmation;
       setOtpSent(true);
+      // NOTE: Using a custom modal/toast is recommended instead of alert() in production.
       alert("OTP Sent Successfully!");
-    } catch (err: any) {
-      setError(err?.message || "OTP sending failed");
+    } catch (err: unknown) {
+      // FIX: Replace 'any' with 'unknown' and narrow type
+      if (err instanceof Error) setError(err.message);
+      else setError("OTP sending failed");
     }
   };
 
@@ -81,9 +92,12 @@ export default function Login() {
     try {
       if (!otp) return setError("Enter OTP");
       await window.confirmationResult.confirm(otp);
+      // NOTE: Using a custom modal/toast is recommended instead of alert() in production.
       alert("Logged in Successfully!");
-    } catch (err: any) {
-      setError(err?.message || "Invalid OTP");
+    } catch (err: unknown) {
+      // FIX: Replace 'any' with 'unknown' and narrow type
+      if (err instanceof Error) setError(err.message);
+      else setError("Invalid OTP");
     }
   };
 
@@ -94,9 +108,12 @@ export default function Login() {
     try {
       const auth = getAuthClient();
       await signInWithEmailAndPassword(auth, email, password);
+      // NOTE: Using a custom modal/toast is recommended instead of alert() in production.
       alert("Login Successful!");
-    } catch (err: any) {
-      setError(err?.message || "Something went wrong");
+    } catch (err: unknown) {
+      // FIX: Replace 'any' with 'unknown' and narrow type
+      if (err instanceof Error) setError(err.message);
+      else setError("Something went wrong");
     }
   };
 
@@ -107,9 +124,12 @@ export default function Login() {
     try {
       const auth = getAuthClient();
       await signInWithPopup(auth, googleProvider);
+      // NOTE: Using a custom modal/toast is recommended instead of alert() in production.
       alert("Logged in with Google!");
-    } catch (err: any) {
-      setError(err?.message || "Something went wrong");
+    } catch (err: unknown) {
+      // FIX: Replace 'any' with 'unknown' and narrow type
+      if (err instanceof Error) setError(err.message);
+      else setError("Something went wrong");
     }
   };
 
