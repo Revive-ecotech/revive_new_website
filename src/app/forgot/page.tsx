@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
       await sendPasswordResetEmail(auth, email);
       setSent(true);
     } catch (err: unknown) {
-      // FIX: Replace 'any' with 'unknown' and narrow type
+      // Fix already applied: using unknown and type narrowing
       if (err instanceof Error) setError(err.message);
       else setError("Something went wrong");
     }
