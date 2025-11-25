@@ -10,9 +10,17 @@ import {
   googleProvider,
   RecaptchaVerifier,
   signInWithPhoneNumber,
+  type ConfirmationResult,
 } from "@/lib/firebase";
 
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+
+// Added global declaration here to ensure it's available. 
+interface Window {
+  recaptchaVerifier: RecaptchaVerifier;
+  confirmationResult: ConfirmationResult; 
+}
+
 
 export default function Signup() {
   const [mode, setMode] = useState<"email" | "phone">("email");
@@ -34,9 +42,15 @@ export default function Signup() {
   // SETUP INVISIBLE RECAPTCHA
   // ==============================
   const setupRecaptcha = () => {
+    // FIX: Must check if 'auth' is not null before using it in RecaptchaVerifier
+    if (!auth) {
+      console.error("Firebase Auth instance is null. Cannot setup Recaptcha.");
+      return null;
+    }
+
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
+        auth, // Auth is guaranteed non-null here
         "recaptcha-container",
         { size: "invisible" }
       );
@@ -55,8 +69,12 @@ export default function Signup() {
     }
 
     try {
+      if (!auth) return setError("Authentication service not ready."); // Safety check
+      
       const fullPhone = "+91" + phone;
       const verifier = setupRecaptcha();
+
+      if (!verifier) return; // Stop if recaptcha failed to set up
 
       const confirmation = await signInWithPhoneNumber(
         auth,
@@ -64,7 +82,7 @@ export default function Signup() {
         verifier
       );
 
-      window.confirmationResult = confirmation;
+      (window as Window).confirmationResult = confirmation;
       setOtpSent(true);
 
       alert("OTP sent successfully!");
@@ -81,7 +99,7 @@ export default function Signup() {
     try {
       if (!otp) return setError("Enter OTP");
 
-      await window.confirmationResult!.confirm(otp);
+      await (window as Window).confirmationResult.confirm(otp);
       alert("Account created successfully!");
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
@@ -101,6 +119,7 @@ export default function Signup() {
     if (password !== confirm) {
       return setError("Passwords do not match");
     }
+    if (!auth) return setError("Authentication service not ready."); // Safety check
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
@@ -115,6 +134,7 @@ export default function Signup() {
   // GOOGLE SIGNUP
   // ==============================
   const googleSignup = async () => {
+    if (!auth) return setError("Authentication service not ready."); // Safety check
     try {
       await signInWithPopup(auth, googleProvider);
       alert("Signed up with Google!");
