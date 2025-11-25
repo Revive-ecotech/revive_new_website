@@ -8,7 +8,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { auth } from "@/lib/firebase";
+// FIX: 'auth' is now correctly exported from lib/firebase
+import { auth } from "@/lib/firebase"; 
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 
 type AuthContextType = {
@@ -24,8 +25,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // FIX: prevents null error during build
-    if (!auth) return;
+    // Check if the auth instance is initialized (which only happens in the browser)
+    if (!auth) {
+      setLoading(false); // If we're not in the browser, stop loading immediately
+      return;
+    }
 
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
@@ -36,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = async () => {
+    // Only attempt sign out if auth is initialized
     if (!auth) return;
     await signOut(auth);
   };
