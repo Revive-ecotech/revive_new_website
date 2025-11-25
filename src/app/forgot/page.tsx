@@ -23,8 +23,10 @@ export default function ForgotPasswordPage() {
       const auth = getAuthClient();
       await sendPasswordResetEmail(auth, email);
       setSent(true);
-    } catch (err: any) {
-      setError(err?.message || "Something went wrong");
+    } catch (err: unknown) {
+      // FIX: Replace 'any' with 'unknown' and narrow type
+      if (err instanceof Error) setError(err.message);
+      else setError("Something went wrong");
     }
   };
 
