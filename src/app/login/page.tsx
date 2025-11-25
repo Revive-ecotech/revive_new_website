@@ -10,7 +10,7 @@ import {
   googleProvider,
   RecaptchaVerifier,
   signInWithPhoneNumber,
-  type ConfirmationResult, // <-- NEW: Import the necessary type
+  type ConfirmationResult,
 } from "@/lib/firebase";
 
 import {
@@ -18,14 +18,14 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 
-// Define custom window properties for Firebase
-declare global {
-  interface Window {
-    recaptchaVerifier: RecaptchaVerifier;
-    // FIX: Replaced 'any' with the correct ConfirmationResult type
-    confirmationResult: ConfirmationResult; 
-  }
+// FIX: Instead of 'declare global', use `interface Window` 
+// and ensure we declare the variables here without conflicting with other modules.
+// Adding an empty export/import block turns this into a module scope.
+interface Window {
+  recaptchaVerifier: RecaptchaVerifier;
+  confirmationResult: ConfirmationResult; 
 }
+
 
 export default function Login() {
   const [mode, setMode] = useState<"email" | "phone">("email");
@@ -46,14 +46,17 @@ export default function Login() {
   const setupRecaptcha = () => {
     const auth = getAuthClient();
 
-    if (!window.recaptchaVerifier) {
+    // Check if window object exists and recaptchaVerifier property is defined
+    if (typeof window !== 'undefined' && !window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(
         auth,
         "recaptcha-container",
         { size: "invisible" }
       );
     }
-    return window.recaptchaVerifier;
+    // Need to handle the case where window might not be defined for SSR safety, 
+    // although this component is marked 'use client'.
+    return typeof window !== 'undefined' ? window.recaptchaVerifier : null;
   };
 
   // --------------------------
@@ -70,13 +73,15 @@ export default function Login() {
       const auth = getAuthClient();
       const verifier = setupRecaptcha();
 
+      if (!verifier) return setError("Recaptcha setup failed.");
+
       const confirmation = await signInWithPhoneNumber(
         auth,
         "+91" + phone,
         verifier
       );
 
-      window.confirmationResult = confirmation;
+      (window as Window).confirmationResult = confirmation;
       setOtpSent(true);
       alert("OTP Sent Successfully!");
     } catch (err: unknown) {
@@ -92,7 +97,7 @@ export default function Login() {
   const loginWithOtp = async () => {
     try {
       if (!otp) return setError("Enter OTP");
-      await window.confirmationResult.confirm(otp);
+      await (window as Window).confirmationResult.confirm(otp);
       alert("Logged in Successfully!");
     } catch (err: unknown) {
       // Corrected error handling
