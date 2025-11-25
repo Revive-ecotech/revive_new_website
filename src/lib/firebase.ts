@@ -1,5 +1,5 @@
 // src/lib/firebase.ts
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -8,10 +8,10 @@ import {
   type Auth,
 } from "firebase/auth";
 
-// --- Only run Firebase in the browser ---
+// Check browser
 const isBrowser = () => typeof window !== "undefined";
 
-// --- Firebase Config ---
+// Firebase config
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
@@ -21,20 +21,23 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
 
-// --- Initialize Firebase (Safe for SSR) ---
-const app = isBrowser()
-  ? getApps().length
-    ? getApp()
-    : initializeApp(firebaseConfig)
-  : null;
+// --- Initialize Firebase ONLY in browser ---
+let app: FirebaseApp | null = null;
 
-// --- AUTH (Always defined in browser, never null) ---
-export const auth: Auth | null = isBrowser() ? getAuth(app!) : null;
+if (isBrowser()) {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+}
 
-// --- Providers ---
-export const googleProvider = isBrowser()
-  ? new GoogleAuthProvider()
-  : null;
+// 🔥 ALWAYS returns a proper Auth object (never null)
+export function getAuthClient(): Auth {
+  if (!app) {
+    throw new Error("Firebase Auth can only be used in the browser.");
+  }
+  return getAuth(app);
+}
 
-// --- Phone Auth Utils ---
+// Providers
+export const googleProvider = new GoogleAuthProvider();
+
+// Phone Auth helpers
 export { RecaptchaVerifier, signInWithPhoneNumber };
