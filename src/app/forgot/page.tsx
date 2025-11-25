@@ -18,6 +18,10 @@ export default function ForgotPasswordPage() {
       setError("Enter your email");
       return;
     }
+    if (!auth) { // Add this check
+      setError("Authentication service is not available");
+      return;
+    }
     try {
       setError("");
       await sendPasswordResetEmail(auth, email);
@@ -27,6 +31,7 @@ export default function ForgotPasswordPage() {
       else setError("Something went wrong");
     }
   };
+
 
   return (
     <div className="min-h-screen bg-[#f5f9f4] p-6 flex items-center justify-center">
