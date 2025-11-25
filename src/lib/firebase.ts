@@ -6,6 +6,7 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   type Auth,
+  type ConfirmationResult,
 } from "firebase/auth";
 
 // Check browser
@@ -23,21 +24,25 @@ const firebaseConfig = {
 
 // --- Initialize Firebase ONLY in browser ---
 let app: FirebaseApp | null = null;
+// NEW: Initialize and export the Auth instance for use in AuthContext
+export let auth: Auth | null = null; 
 
 if (isBrowser()) {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app); // Initialize the exported 'auth' instance
 }
 
 // 🔥 ALWAYS returns a proper Auth object (never null)
 export function getAuthClient(): Auth {
-  if (!app) {
+  if (!auth) { 
     throw new Error("Firebase Auth can only be used in the browser.");
   }
-  return getAuth(app);
+  return auth;
 }
 
 // Providers
 export const googleProvider = new GoogleAuthProvider();
 
 // Phone Auth helpers
-export { RecaptchaVerifier, signInWithPhoneNumber };
+// Exporting the necessary functions and types
+export { RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult, getAuth };
