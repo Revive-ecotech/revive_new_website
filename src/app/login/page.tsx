@@ -24,17 +24,21 @@ export default function Login() {
   // ------------------------------------------
   // SETUP INVISIBLE RECAPTCHA (NO UI)
   // ------------------------------------------
-  const setupRecaptcha = () => {
+   const setupRecaptcha = () => {
+    if (!auth) {
+      setError("Authentication service is not available");
+      return null;
+    }
+  
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
+        auth,  // Make sure auth is not null
         "recaptcha-container",
         { size: "invisible" }
       );
     }
     return window.recaptchaVerifier;
   };
-
   // ------------------------------------------
   // SEND OTP
   // ------------------------------------------
