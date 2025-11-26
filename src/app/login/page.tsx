@@ -27,6 +27,7 @@ import {
   signInWithEmailAndPassword as FsignInWithEmailAndPassword,
   signInWithPopup as FsignInWithPopup,
   type Auth,
+  type ConfirmationResult, // Import ConfirmationResult type
 } from 'firebase/auth';
 
 let auth: Auth | null = null;
@@ -38,12 +39,12 @@ const signInWithPhoneNumber = FsignInWithPhoneNumber;
 declare global {
   interface Window {
     recaptchaVerifier: FRecaptchaVerifier | undefined;
-    confirmationResult: any; // Firebase SDK dictates this type, keeping it for compatibility
+    confirmationResult: ConfirmationResult | undefined; // FIX 3: Replaced 'any' with ConfirmationResult
   }
 }
 
 const setupFirebase = () => {
-  let firebaseConfig: Record<string, string> = {}; // FIX 1: Replaced any with Record<string, string>
+  let firebaseConfig: Record<string, string> = {}; 
   
   // Load config from global variable
   try {
@@ -61,7 +62,7 @@ const setupFirebase = () => {
   }
   
   // Initialize app
-  const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp(); // FIX 2: Explicitly typed app
+  const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp(); 
   auth = getAuth(app);
   
   // Authenticate user
@@ -170,7 +171,8 @@ export default function App() {
         verifier
       );
 
-      window.confirmationResult = confirmation;
+      // Store the ConfirmationResult object
+      window.confirmationResult = confirmation; 
       setOtpSent(true);
       showMessage("OTP Sent Successfully!");
     } catch (err: unknown) { 
