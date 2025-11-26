@@ -36,12 +36,8 @@ const googleProvider = new GoogleAuthProvider();
 const RecaptchaVerifier = FRecaptchaVerifier;
 const signInWithPhoneNumber = FsignInWithPhoneNumber;
 
-declare global {
-  interface Window {
-    recaptchaVerifier: FRecaptchaVerifier | undefined;
-    confirmationResult: ConfirmationResult | undefined; // FIX 3: Replaced 'any' with ConfirmationResult
-  }
-}
+// FIX: Removed conflicting global declaration for window.recaptchaVerifier
+// We will use type assertions in setupRecaptcha and loginWithOtp instead.
 
 const setupFirebase = () => {
   let firebaseConfig: Record<string, string> = {}; 
@@ -138,16 +134,18 @@ export default function App() {
   // --------------------------
   const setupRecaptcha = () => {
     if (!auth) throw new Error("Authentication service not initialized.");
+    
+    // Use type assertion to access window property
+    const w = window as any;
 
-    if (!window.recaptchaVerifier) {
-      // Assuming a div with id="recaptcha-container" exists in the return block
-      window.recaptchaVerifier = new RecaptchaVerifier(
+    if (!w.recaptchaVerifier) {
+      w.recaptchaVerifier = new RecaptchaVerifier(
         auth,
         "recaptcha-container",
         { size: "invisible" }
       );
     }
-    return window.recaptchaVerifier;
+    return w.recaptchaVerifier as FRecaptchaVerifier;
   };
 
   // --------------------------
@@ -171,8 +169,8 @@ export default function App() {
         verifier
       );
 
-      // Store the ConfirmationResult object
-      window.confirmationResult = confirmation; 
+      // Store the ConfirmationResult object using type assertion
+      (window as any).confirmationResult = confirmation; 
       setOtpSent(true);
       showMessage("OTP Sent Successfully!");
     } catch (err: unknown) { 
@@ -189,11 +187,13 @@ export default function App() {
     setSuccessMessage("");
     if (!isAuthReady) return setError("Authentication not ready. Please wait.");
     
+    const confirmationResult = (window as any).confirmationResult as ConfirmationResult | undefined;
+
     try {
       if (!otp) return setError("Enter OTP");
-      if (!window.confirmationResult) return setError("OTP verification process not started. Send OTP first.");
+      if (!confirmationResult) return setError("OTP verification process not started. Send OTP first.");
 
-      await window.confirmationResult.confirm(otp);
+      await confirmationResult.confirm(otp);
       showMessage("Logged in Successfully!");
     } catch (err: unknown) { 
       if (err instanceof Error) setError(err.message);
