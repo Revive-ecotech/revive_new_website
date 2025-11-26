@@ -19,22 +19,36 @@ export const metadata: Metadata = {
   description: "Earn by recycling waste",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
-        {/* 🔥 DIRECT GOOGLE META TAG (Guaranteed Detect) */}
+        {/* ⭐ Google Search Console Verification */}
         <meta
           name="google-site-verification"
           content="ADlb8HGH4MnniAFAryH0KHNuH_7EMyNZtTA_hGJAT18"
         />
       </head>
 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`
+          ${geistSans.variable} 
+          ${geistMono.variable} 
+          antialiased 
+          bg-[#F2F7F2] text-[#253612]
+        `}
+      >
+        {/* Recaptcha container (Required for Firebase Phone Auth) */}
         <div id="recaptcha-container"></div>
 
+        {/* Firebase Auth Context Provider */}
         <AuthProvider>{children}</AuthProvider>
 
+        {/* Vercel Analytics */}
         <Analytics />
       </body>
     </html>

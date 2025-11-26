@@ -1,199 +1,101 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-// Replaced Next.js imports with standard equivalents for compatibility
-import { Mail, LogIn, Home, Lock } from "lucide-react"; 
+import { useState } from "react";
+import { Mail, LogIn, Home } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-// --- FIREBASE IMPORTS ---
-// Note: In a real Next.js project, you would import these from "@/lib/firebase"
+import { auth } from "@/lib/firebase";
+import { sendPasswordResetEmail } from "firebase/auth";
 
-declare const __firebase_config: string;
-declare const __initial_auth_token: string;
-
-import { 
-  initializeApp,
-  getApps,
-  getApp,
-  FirebaseApp, // Imported FirebaseApp type
-} from 'firebase/app';
-import { 
-  getAuth, 
-  signInAnonymously, 
-  signInWithCustomToken, 
-  onAuthStateChanged, 
-  sendPasswordResetEmail,
-  type Auth,
-} from 'firebase/auth';
-
-let auth: Auth | null = null;
-
-const setupFirebase = () => {
-  let firebaseConfig: Record<string, string> = {}; // FIX 1: Replaced any with Record<string, string>
-  
-  // Load config from global variable
-  try {
-    firebaseConfig = typeof __firebase_config !== 'undefined' 
-      ? JSON.parse(__firebase_config) 
-      : {};
-  } catch (e) {
-    console.error("Error parsing __firebase_config:", e);
-    return null;
-  }
-  
-  if (Object.keys(firebaseConfig).length === 0) {
-    console.error("Firebase configuration is missing.");
-    return null;
-  }
-  
-  // Initialize app
-  const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp(); // FIX 2: Explicitly typed app
-  auth = getAuth(app);
-  
-  // Authenticate user
-  const authenticate = async () => {
-    try {
-      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-        await signInWithCustomToken(auth!, __initial_auth_token);
-      } else {
-        await signInAnonymously(auth!);
-      }
-    } catch (e) {
-      console.error("Firebase Auth initialization failed:", e);
-    }
-  };
-
-  authenticate();
-  return auth;
-};
-
-// -----------------------------------------------------
-// Next.js Forgot Password Page Component (Default Export)
-// -----------------------------------------------------
-
-export default function App() {
-  const [isAuthReady, setIsAuthReady] = useState(false);
+export default function ForgotPage() {
+  const router = useRouter();
 
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // Firebase Initialization and Auth Listener
-  useEffect(() => {
-    const initializedAuth = setupFirebase();
-    
-    if (!initializedAuth) {
-        setError("Could not initialize Firebase. Configuration missing.");
-        return;
-    }
-    
-    auth = initializedAuth; 
+  // Helper message handler
+  const notify = (msg: string, isError = true) => {
+    if (isError) setError(msg);
+    else setSuccess(msg);
 
-    const unsubscribe = onAuthStateChanged(auth, () => {
-        setIsAuthReady(true);
-    });
-
-    return () => unsubscribe();
-  }, []);
-  
-  const showMessage = (message: string, isError = false) => {
-    if (isError) {
-        setError(message);
-        setSuccessMessage("");
-    } else {
-        setSuccessMessage(message);
-        setError("");
-    }
     setTimeout(() => {
-      setSuccessMessage("");
       setError("");
-    }, 5000); 
+      setSuccess("");
+    }, 2500);
   };
-
 
   const handleReset = async () => {
     setError("");
-    setSuccessMessage("");
-    
-    if (!isAuthReady) return setError("Authentication not ready. Please wait.");
-    
-    if (!email) {
-      return setError("Enter your email");
-    }
+    setSuccess("");
+
+    if (!email.trim()) return notify("Please enter your email.", true);
 
     try {
       await sendPasswordResetEmail(auth!, email);
-      setSent(true);
-      showMessage("Password reset link sent successfully!");
-    } catch (err: unknown) { // FIX 5: Preserved the type safety fix
-      if (err instanceof Error) setError(err.message);
-      else setError("Something went wrong");
-      setSent(false);
+      notify("Password reset link sent to your email!", false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error sending reset link.";
+      notify(msg, true);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f9f4] p-6 flex items-center justify-center font-inter">
-      <style>{`
-        .font-inter {
-          font-family: 'Inter', sans-serif;
-        }
-      `}</style>
-      <div className="w-full max-w-lg bg-white rounded-3xl border shadow-2xl p-8 md:p-10">
-        
-        {/* Header/Navigation - Simulating Link behavior */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="bg-[#253612] text-white px-4 py-2 rounded-full text-sm flex items-center gap-2 cursor-pointer">
+    <div className="min-h-screen bg-[#F2F7F2] flex items-center justify-center px-4">
+      <div className="w-full max-w-lg bg-white shadow-xl border rounded-3xl p-8">
+
+        {/* NAV BUTTONS */}
+        <div className="flex justify-between mb-6">
+          <button
+            onClick={() => router.push("/")}
+            className="px-4 py-2 flex items-center gap-2 rounded-full border text-[#253612]
+                       hover:bg-[#eef3eb] transition"
+          >
             <Home size={16} /> Home
-          </div>
-          <div className="bg-[#253612] text-white px-4 py-2 rounded-full text-sm flex items-center gap-2 cursor-pointer">
+          </button>
+
+          <button
+            onClick={() => router.push("/login")}
+            className="px-4 py-2 flex items-center gap-2 rounded-full border text-[#253612]
+                       hover:bg-[#eef3eb] transition"
+          >
             <LogIn size={16} /> Log In
-          </div>
+          </button>
         </div>
 
-        {/* Logo - Simulating Image with SVG placeholder */}
-        <div className="mb-6 w-20 h-20 rounded-full bg-[#253612] flex items-center justify-center">
-            <Lock className="text-white" size={32} />
-        </div>
+        {/* Heading */}
+        <h1 className="text-3xl font-semibold text-[#253612] mb-1">
+          Forgot Password
+        </h1>
+        <p className="text-gray-500 mb-6">
+          Enter your email to receive a reset link.
+        </p>
 
-        <h1 className="text-3xl font-bold text-[#253612] mb-1">Forgot Password</h1>
-        <p className="text-gray-600 mb-6">Enter your email to receive a reset link.</p>
-
-        {/* Error/Success Messages */}
+        {/* Alerts */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-4" role="alert">
-            <span className="block sm:inline">{error}</span>
-          </div>
+          <p className="bg-red-100 text-red-700 px-3 py-2 rounded mb-4">{error}</p>
         )}
-        {(sent || successMessage) && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative mb-4" role="alert">
-            <span className="block sm:inline">{successMessage || "Reset link sent! Check your email."}</span>
-          </div>
-        )}
-        
-        {/* Loading/Auth Status */}
-        {!isAuthReady && (
-            <p className="text-blue-500 mb-4">Initializing authentication...</p>
+        {success && (
+          <p className="bg-green-100 text-green-700 px-3 py-2 rounded mb-4">{success}</p>
         )}
 
-
+        {/* EMAIL FIELD */}
         <div className="relative mb-6">
-          <Mail className="absolute left-4 top-5 text-[#253612]" size={20} />
-          <label className="absolute left-12 top-2 text-xs text-gray-500">Email</label>
-
+          <Mail className="absolute left-3 top-3 text-gray-500" size={18} />
           <input
             type="email"
             placeholder="you@example.com"
-            className="w-full border border-gray-300 rounded-xl pl-12 pr-4 pt-7 pb-3 focus:ring-2 focus:ring-[#253612]/50 focus:border-transparent transition"
+            className="w-full pl-10 pr-4 py-3 rounded-xl border bg-gray-50 
+                       focus:ring-2 focus:ring-[#253612]"
             onChange={(e) => setEmail(e.target.value)}
-            disabled={!isAuthReady}
           />
         </div>
 
+        {/* RESET BUTTON */}
         <button
           onClick={handleReset}
-          className="w-full bg-[#253612] text-white py-3 rounded-2xl font-semibold hover:bg-[#39501a] transition duration-200 shadow-md disabled:bg-gray-400"
-          disabled={!isAuthReady || !email}
+          className="w-full py-3 rounded-xl bg-[#253612] text-white font-semibold
+                     hover:bg-[#1c2a0e] transition"
         >
           Send Reset Link
         </button>

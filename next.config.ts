@@ -1,7 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com", // Google Login profile photos
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com", // if GitHub login used later
+      },
+    ],
+  },
 };
 
 export default nextConfig;

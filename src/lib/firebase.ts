@@ -1,4 +1,5 @@
-// src/lib/firebase.ts
+"use client";
+
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import {
   getAuth,
@@ -9,10 +10,26 @@ import {
   type ConfirmationResult,
 } from "firebase/auth";
 
-// Check browser
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  setDoc,
+  doc,
+  serverTimestamp,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
+
+// --------------------------------------------------
+// 1️⃣ Browser check to avoid "window is undefined"
+// --------------------------------------------------
 const isBrowser = () => typeof window !== "undefined";
 
-// Firebase config
+// --------------------------------------------------
+// 2️⃣ Firebase Config
+// --------------------------------------------------
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
@@ -22,27 +39,111 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
 
-// --- Initialize Firebase ONLY in browser ---
+// --------------------------------------------------
+// 3️⃣ Init Firebase (Browser Only)
+// --------------------------------------------------
 let app: FirebaseApp | null = null;
-// NEW: Initialize and export the Auth instance for use in AuthContext
-export let auth: Auth | null = null; 
+let auth: Auth | null = null;
+let db: ReturnType<typeof getFirestore> | null = null;
 
 if (isBrowser()) {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-  auth = getAuth(app); // Initialize the exported 'auth' instance
+  auth = getAuth(app);
+  db = getFirestore(app);
 }
 
-// 🔥 ALWAYS returns a proper Auth object (never null)
+// --------------------------------------------------
+// 4️⃣ Safe Exported Getters
+// --------------------------------------------------
 export function getAuthClient(): Auth {
-  if (!auth) { 
-    throw new Error("Firebase Auth can only be used in the browser.");
-  }
+  if (!auth) throw new Error("Firebase Auth is only available in the browser.");
   return auth;
 }
 
-// Providers
+export function getDB() {
+  if (!db) throw new Error("Firestore is only available in the browser.");
+  return db;
+}
+
+// --------------------------------------------------
+// 5️⃣ Google Provider
+// --------------------------------------------------
 export const googleProvider = new GoogleAuthProvider();
 
-// Phone Auth helpers
-// Exporting the necessary functions and types
-export { RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult, getAuth };
+// --------------------------------------------------
+// 6️⃣ Phone Auth Exports
+// --------------------------------------------------
+export {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  type ConfirmationResult,
+};
+
+// --------------------------------------------------
+// 7️⃣ 🔥 FIRESTORE WRITE FUNCTIONS
+// --------------------------------------------------
+
+// SAVE PICKUP REQUEST
+export async function savePickup(data: any) {
+  const dbClient = getDB();
+  const ref = collection(dbClient, "pickups");
+
+  return await addDoc(ref, {
+    ...data,
+    createdAt: serverTimestamp(),
+  });
+}
+
+// SAVE PREVIOUS REQUEST
+export async function savePreviousRequest(userId: string, data: any) {
+  const dbClient = getDB();
+  const ref = collection(dbClient, "previousRequests");
+
+  return await addDoc(ref, {
+    userId,
+    ...data,
+    createdAt: serverTimestamp(),
+  });
+}
+
+// SAVE USER PROFILE
+export async function saveUserProfile(userId: string, data: any) {
+  const dbClient = getDB();
+  const userRef = doc(dbClient, "users", userId);
+
+  return await setDoc(userRef, {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+// --------------------------------------------------
+// 8️⃣ 🔥 FIRESTORE READ FUNCTIONS
+// --------------------------------------------------
+
+// GET USER PICKUPS
+export async function getUserPickups(userId: string) {
+  const dbClient = getDB();
+  const ref = collection(dbClient, "pickups");
+
+  const q = query(ref, where("userId", "==", userId));
+  const snap = await getDocs(q);
+
+  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}
+
+// GET USER PREVIOUS REQUESTS
+export async function getUserPrevious(userId: string) {
+  const dbClient = getDB();
+  const ref = collection(dbClient, "previousRequests");
+
+  const q = query(ref, where("userId", "==", userId));
+  const snap = await getDocs(q);
+
+  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}
+
+// --------------------------------------------------
+// 9️⃣ Export instances (optional)
+// --------------------------------------------------
+export { auth, db };

@@ -1,75 +1,175 @@
 @import "tailwindcss";
 
-/* ------------------------------ */
-/* Light / Dark Theme Variables   */
-/* ------------------------------ */
+/* -------------------------------------------------------- */
+/*  🌿 Revive Theme Colors                                  */
+/* -------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --revive-green: #253612; /* Dark forest green */
+  --revive-green-hover: #1C2A0E;
+  --revive-mint: #F2F7F2; /* Light mint background */
+  --revive-border: #D9E2D4; /* Soft border */
+  --revive-input-bg: #F7FAF7;
+  --revive-text: #253612;
+  --revive-shadow: rgba(0, 0, 0, 0.08);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* -------------------------------------------------------- */
+/*  🌿 Base Body                                             */
+/* -------------------------------------------------------- */
+html, body {
+  background: var(--revive-mint);
+  color: var(--revive-text);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #ffffff; /* You are forcing light mode — kept as is */
-    --foreground: #ededed;
-  }
+/* Prevent blue selection highlights */
+* {
+  outline: none !important;
 }
 
-/* ------------------------------ */
-/* Base Body Styling              */
-/* ------------------------------ */
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), var(--font-sans), system-ui, -apple-system, sans-serif;
+/* -------------------------------------------------------- */
+/*  🌿 Universal Input Styling                              */
+/* -------------------------------------------------------- */
+input, textarea, select {
+  background: var(--revive-input-bg) !important;
+  border: 1px solid var(--revive-border) !important;
+  color: var(--revive-text) !important;
+  border-radius: 0.75rem;
+  padding: 10px 14px;
+  transition: all 0.2s ease;
 }
 
-/* ------------------------------ */
-/* Animation Classes              */
-/* ------------------------------ */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--revive-green) !important;
+  box-shadow: 0 0 0 3px rgba(37, 54, 18, 0.15);
+}
+
+/* -------------------------------------------------------- */
+/*  🌿 Revive Card Style                                     */
+/* -------------------------------------------------------- */
+.revive-card {
+  background: white;
+  border: 1px solid var(--revive-border);
+  border-radius: 1.5rem;
+  box-shadow: 0 6px 18px var(--revive-shadow);
+  padding: 1.75rem;
+  animation: fade-in 0.3s ease-out;
+}
+
+/* -------------------------------------------------------- */
+/*  🌿 Primary Button (Green)                                */
+/* -------------------------------------------------------- */
+.revive-btn {
+  background: var(--revive-green) !important;
+  color: white !important;
+  font-weight: 600;
+  border-radius: 0.9rem;
+  padding: 12px 18px;
+  box-shadow: 0 4px 12px rgba(37, 54, 18, 0.25);
+  transition: all 0.2s ease;
+}
+
+.revive-btn:hover {
+  background: var(--revive-green-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 54, 18, 0.35);
+}
+
+/* -------------------------------------------------------- */
+/*  🌿 Outline Button                                       */
+/* -------------------------------------------------------- */
+.revive-outline {
+  border: 1.5px solid var(--revive-green);
+  color: var(--revive-green);
+  font-weight: 600;
+  border-radius: 0.9rem;
+  padding: 12px 18px;
+  transition: all 0.2s ease;
+}
+
+.revive-outline:hover {
+  background: rgba(37, 54, 18, 0.08);
+}
+
+/* -------------------------------------------------------- */
+/*  🌿 Fade-In Animation                                     */
+/* -------------------------------------------------------- */
 @keyframes fade-in {
   from {
     opacity: 0;
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .fade-in {
-  animation: fade-in 0.3s ease-in;
+  animation: fade-in 0.25s ease-out;
 }
 
-/* ------------------------------ */
-/* ⭐ RADIX UI SELECT FIX ⭐        */
-/* Makes dropdown boxes visible   */
-/* Works with Tailwind v4         */
-/* ------------------------------ */
+/* -------------------------------------------------------- */
+/*  ⭐ Dropdown Styling (Profile Menu, Popovers, etc.)       */
+/* -------------------------------------------------------- */
+.revive-dropdown {
+  background: white;
+  border: 1px solid var(--revive-border);
+  border-radius: 1rem;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+  animation: fade-in 0.22s ease;
+}
+
+.revive-dropdown button {
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  border-radius: 0.7rem;
+  transition: background 0.15s ease;
+}
+
+.revive-dropdown button:hover {
+  background: var(--revive-mint);
+}
+
+/* Logout option */
+.revive-dropdown .danger {
+  color: #C62828 !important;
+}
+.revive-dropdown .danger:hover {
+  background: #ffecec !important;
+}
+
+/* -------------------------------------------------------- */
+/*  ⭐ Radix UI Select Fix                                   */
+/* -------------------------------------------------------- */
 [data-radix-select-content] {
   background: #ffffff !important;
-  border: 1px solid #d1d5db !important;   /* gray-300 */
-  border-radius: 0.5rem !important;       /* rounded-md */
-  color: #1f2937 !important;              /* gray-800 */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid var(--revive-border) !important;
+  border-radius: 0.75rem !important;
+  color: var(--revive-text) !important;
   padding: 4px 0 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
 }
 
 [data-radix-select-item] {
   background: #ffffff !important;
-  padding: 8px 14px !important;
+  padding: 10px 14px !important;
+  color: var(--revive-text) !important;
+  border-radius: 6px !important;
   font-size: 0.95rem !important;
-  color: #1f2937 !important;
-  cursor: pointer !important;
-  border-radius: 4px !important;
 }
 
 [data-radix-select-item][data-highlighted] {
-  background: #f3f4f6 !important; /* gray-100 */
+  background: #F2F7F2 !important;
+  color: var(--revive-green) !important;
+}
+
+/* -------------------------------------------------------- */
+/*  🖼 Image Styling                                         */
+/* -------------------------------------------------------- */
+img, .next-image {
+  border-radius: 0.75rem;
 }

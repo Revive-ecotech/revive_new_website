@@ -1,4 +1,3 @@
-// src/context/AuthContext.tsx
 "use client";
 
 import {
@@ -8,52 +7,71 @@ import {
   useState,
   type ReactNode,
 } from "react";
-// FIX: 'auth' is now correctly exported from lib/firebase
-import { auth } from "@/lib/firebase"; 
-import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 
-type AuthContextType = {
+import {
+  onAuthStateChanged,
+  signOut,
+  type User,
+} from "firebase/auth";
+
+import { auth } from "@/lib/firebase";
+
+// -------------------------
+// TYPES
+// -------------------------
+interface AuthContextType {
   user: User | null;
   loading: boolean;
   logout: () => Promise<void>;
-};
+}
 
+// -------------------------
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+// -------------------------
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Listen for auth state changes ONLY in browser
   useEffect(() => {
-    // Check if the auth instance is initialized (which only happens in the browser)
     if (!auth) {
-      setLoading(false); // If we're not in the browser, stop loading immediately
+      console.warn("Auth not initialized (SSR mode)");
       return;
     }
 
-    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
+    const unsub = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser ?? null);
       setLoading(false);
     });
 
     return () => unsub();
   }, []);
 
+  // -------------------------
+  // LOGOUT (Safe)
+  // -------------------------
   const logout = async () => {
-    // Only attempt sign out if auth is initialized
     if (!auth) return;
-    await signOut(auth);
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
     <AuthContext.Provider value={{ user, loading, logout }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+// -------------------------
+export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  if (!ctx) {
+    throw new Error("useAuth must be used inside <AuthProvider>");
+  }
   return ctx;
-}
+};
