@@ -36,8 +36,7 @@ const googleProvider = new GoogleAuthProvider();
 const RecaptchaVerifier = FRecaptchaVerifier;
 const signInWithPhoneNumber = FsignInWithPhoneNumber;
 
-// Extend the global Window interface locally within this file's scope
-// to correctly type Firebase phone auth properties, eliminating 'as any'.
+// Define a safe, extended interface for window properties needed by Firebase
 interface FirebaseWindow extends Window {
     recaptchaVerifier?: FRecaptchaVerifier;
     confirmationResult?: ConfirmationResult;
@@ -100,14 +99,19 @@ export default function App() {
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-
-  // Cast window to our safe, extended type
-  const w = window as unknown as FirebaseWindow;
+  
+  // Define w locally here, but access it only in client-side functions
+  // Initialize to null to avoid SSR crash
+  let w: FirebaseWindow | null = null; 
 
   // Firebase Initialization and Auth Listener
   useEffect(() => {
+    // This code runs only on the client
     const initializedAuth = setupFirebase();
     
+    // Assign window reference here, only on client mount
+    w = window as unknown as FirebaseWindow;
+
     if (!initializedAuth) {
         setError("Could not initialize Firebase. Configuration missing.");
         return;
@@ -135,6 +139,15 @@ export default function App() {
       setError("");
     }, 5000); 
   };
+  
+  // Helper to ensure window reference is available before use
+  const getWindowReference = (): FirebaseWindow => {
+      if (!w) {
+          // This should technically never happen if called from an event handler after useEffect runs
+          throw new Error("Client environment (window) not initialized.");
+      }
+      return w;
+  }
 
   // --------------------------
   // Setup Recaptcha
@@ -142,14 +155,16 @@ export default function App() {
   const setupRecaptcha = () => {
     if (!auth) throw new Error("Authentication service not initialized.");
     
-    if (!w.recaptchaVerifier) { // Used w instead of (window as any)
-      w.recaptchaVerifier = new RecaptchaVerifier(
+    const wRef = getWindowReference(); // Get safe window reference
+
+    if (!wRef.recaptchaVerifier) {
+      wRef.recaptchaVerifier = new RecaptchaVerifier(
         auth,
         "recaptcha-container",
         { size: "invisible" }
       );
     }
-    return w.recaptchaVerifier;
+    return wRef.recaptchaVerifier;
   };
 
   // --------------------------
@@ -165,6 +180,7 @@ export default function App() {
     }
 
     try {
+      const wRef = getWindowReference(); // Get safe window reference
       const verifier = setupRecaptcha();
 
       const confirmation = await signInWithPhoneNumber(
@@ -174,7 +190,7 @@ export default function App() {
       );
 
       // Store the ConfirmationResult object using the typed 'w' object
-      w.confirmationResult = confirmation; // FIX 1: Removed (window as any)
+      wRef.confirmationResult = confirmation; 
       setOtpSent(true);
       showMessage("OTP Sent Successfully!");
     } catch (err: unknown) { 
@@ -191,7 +207,8 @@ export default function App() {
     setSuccessMessage("");
     if (!isAuthReady) return setError("Authentication not ready. Please wait.");
     
-    const confirmationResult = w.confirmationResult; // FIX 2: Removed (window as any)
+    const wRef = getWindowReference(); // Get safe window reference
+    const confirmationResult = wRef.confirmationResult; 
 
     try {
       if (!otp) return setError("Enter OTP");
