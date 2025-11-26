@@ -5,7 +5,6 @@ import React, { useState, useEffect } from "react";
 import { Eye, EyeOff, Mail, Lock, LogIn, UserPlus, Home } from "lucide-react";
 
 // --- FIREBASE IMPORTS ---
-// Note: In a real Next.js project, you would import these from "@/lib/firebase"
 
 declare const __firebase_config: string;
 declare const __initial_auth_token: string;
@@ -35,6 +34,9 @@ let auth: Auth | null = null;
 const googleProvider = new GoogleAuthProvider();
 const RecaptchaVerifier = FRecaptchaVerifier;
 const signInWithPhoneNumber = FsignInWithPhoneNumber;
+const signInWithEmailAndPassword = FsignInWithEmailAndPassword;
+const signInWithPopup = FsignInWithPopup;
+
 
 // Define a safe, extended interface for window properties needed by Firebase
 interface FirebaseWindow extends Window {
@@ -45,7 +47,7 @@ interface FirebaseWindow extends Window {
 const setupFirebase = () => {
   let firebaseConfig: Record<string, string> = {}; 
   
-  // Load config from global variable
+  // Attempt to load config from environment variable
   try {
     firebaseConfig = typeof __firebase_config !== 'undefined' 
       ? JSON.parse(__firebase_config) 
@@ -54,23 +56,21 @@ const setupFirebase = () => {
     console.error("Error parsing __firebase_config:", e);
   }
   
-  // === DEBUG FALLBACK: START ===
-  // If no config is loaded from the environment, use a mock config to allow initialization.
-  // REMOVE THIS BLOCK in a production environment or when deployment variables are working.
+  // === CONFIGURATION FALLBACK: START (Using provided valid keys) ===
   if (Object.keys(firebaseConfig).length === 0) {
-      console.warn("Using DEBUG fallback Firebase configuration.");
+      console.warn("Using hardcoded Firebase configuration.");
       firebaseConfig = {
-          apiKey: "MOCK-API-KEY",
-          authDomain: "mock-domain.firebaseapp.com",
-          projectId: "mock-project-id",
-          storageBucket: "mock-bucket.appspot.com",
-          messagingSenderId: "123456789012",
-          appId: "1:123456789012:web:mockid"
+          // *** UPDATED with your valid API Key ***
+          apiKey: "AIzaSyC0_RQcE9maGWo-T7B_99Cd9eRk0lW9d5k", 
+          authDomain: "reviveecotech-dfbed.firebaseapp.com",
+          projectId: "reviveecotech-dfbed",
+          storageBucket: "reviveecotech-dfbed.firebasestorage.app",
+          messagingSenderId: "967064516173",
+          appId: "1:967064516173:web:b0f172c527d31d537b0e04"
       };
   }
-  // === DEBUG FALLBACK: END ===
+  // === CONFIGURATION FALLBACK: END ===
   
-  // Re-check: If still missing, return null
   if (Object.keys(firebaseConfig).length === 0) {
     console.error("Firebase configuration is missing after all attempts.");
     return null;
@@ -116,8 +116,6 @@ export default function App() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   
-  // Define w locally here, but access it only in client-side functions
-  // Initialize to null to avoid SSR crash
   let w: FirebaseWindow | null = null; 
 
   // Firebase Initialization and Auth Listener
@@ -162,7 +160,6 @@ export default function App() {
   // Helper to ensure window reference is available before use
   const getWindowReference = (): FirebaseWindow => {
       // We check w for null only if we are sure we are on the client side.
-      // Since this is only called from click handlers after useEffect runs, w should be set.
       if (w === null) { 
           throw new Error("Client environment (window) not initialized.");
       }
@@ -188,7 +185,7 @@ export default function App() {
   };
 
   // --------------------------
-  // Send OTP (FIX 1: catch block updated)
+  // Send OTP (Type Safe)
   // --------------------------
   const sendOtp = async () => {
     setError("");
@@ -200,7 +197,7 @@ export default function App() {
     }
 
     try {
-      const wRef = getWindowReference(); // Get safe window reference
+      const wRef = getWindowReference(); 
       const verifier = setupRecaptcha();
 
       const confirmation = await signInWithPhoneNumber(
@@ -209,25 +206,24 @@ export default function App() {
         verifier
       );
 
-      // Store the ConfirmationResult object using the typed 'w' object
       wRef.confirmationResult = confirmation; 
       setOtpSent(true);
       showMessage("OTP Sent Successfully!");
-    } catch (err: unknown) { 
+    } catch (err: unknown) { // Type safety fix
       if (err instanceof Error) setError(err.message);
       else setError("OTP sending failed");
     }
   };
 
   // --------------------------
-  // Verify OTP (FIX 2: catch block updated)
+  // Verify OTP (Type Safe)
   // --------------------------
   const loginWithOtp = async () => {
     setError("");
     setSuccessMessage("");
     if (!isAuthReady) return setError("Authentication not ready. Please wait.");
     
-    const wRef = getWindowReference(); // Get safe window reference
+    const wRef = getWindowReference(); 
     const confirmationResult = wRef.confirmationResult; 
 
     try {
@@ -236,14 +232,14 @@ export default function App() {
 
       await confirmationResult.confirm(otp);
       showMessage("Logged in Successfully!");
-    } catch (err: unknown) { 
+    } catch (err: unknown) { // Type safety fix
       if (err instanceof Error) setError(err.message);
       else setError("Invalid OTP");
     }
   };
 
   // --------------------------
-  // Email login (FIX 3: catch block updated)
+  // Email login (Type Safe)
   // --------------------------
   const loginEmail = async () => {
     setError("");
@@ -252,16 +248,16 @@ export default function App() {
     
     try {
       if (!email || !password) return setError("Please enter both email and password.");
-      await FsignInWithEmailAndPassword(auth!, email, password);
+      await signInWithEmailAndPassword(auth!, email, password);
       showMessage("Login Successful!");
-    } catch (err: unknown) { 
+    } catch (err: unknown) { // Type safety fix
       if (err instanceof Error) setError(err.message);
       else setError("Something went wrong");
     }
   };
 
   // --------------------------
-  // Google login (FIX 4: catch block updated)
+  // Google login (Type Safe)
   // --------------------------
   const googleLogin = async () => {
     setError("");
@@ -269,16 +265,17 @@ export default function App() {
     if (!isAuthReady) return setError("Authentication not ready. Please wait.");
     
     try {
-      await FsignInWithPopup(auth!, googleProvider);
+      await signInWithPopup(auth!, googleProvider);
       showMessage("Logged in with Google!");
-    } catch (err: unknown) { 
+    } catch (err: unknown) { // Type safety fix
       if (err instanceof Error) setError(err.message);
       else setError("Something went wrong");
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f9f4] p-6 md:p-10 flex items-center justify-center font-inter">
+    // UPDATED: Darker background color for contrast
+    <div className="min-h-screen bg-gray-50 p-6 md:p-10 flex items-center justify-center font-inter"> 
       
       {/* Recaptcha container is invisible, but required for Phone Auth */}
       <div id="recaptcha-container"></div>
@@ -289,21 +286,34 @@ export default function App() {
         }
       `}</style>
 
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-8 md:p-10 border border-gray-100">
+      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-8 md:p-10 border border-gray-200">
         
         {/* Header/Navigation - Simulating Next.js Link behavior */}
         <div className="flex items-center justify-between mb-8">
           <div className="bg-[#253612] text-white px-4 py-2 rounded-full text-sm flex items-center gap-2 cursor-pointer">
             <Home size={16} /> Home
           </div>
-          <div className="bg-[#253612] text-white px-4 py-2 rounded-full text-sm flex items-center gap-2 cursor-pointer">
+          <div 
+            onClick={() => console.log("Navigating to /signup")}
+            className="bg-[#253612] text-white px-4 py-2 rounded-full text-sm flex items-center gap-2 cursor-pointer"
+          >
             <UserPlus size={16} /> Sign Up
           </div>
         </div>
 
-        {/* Logo - Simulating Next.js Image with SVG placeholder */}
-        <div className="mb-6 w-20 h-20 rounded-full bg-[#253612] flex items-center justify-center">
-            <LogIn className="text-white" size={32} />
+        {/* LOGO (Updated to use external URL and link to Home) */}
+        <div 
+          className="mb-6 cursor-pointer inline-block"
+          onClick={() => console.log("Navigating to / (Home)")} 
+          aria-label="Go to Home"
+        >
+          <img
+            src="https://www.revives.in/_next/image?url=%2Flogo2.png&w=256&q=75"
+            width={100}
+            height={100}
+            alt="Revive Logo"
+            className="rounded-xl shadow-md"
+          />
         </div>
 
         <h1 className="text-3xl font-bold text-[#253612] mb-1">Welcome Back</h1>
@@ -362,7 +372,8 @@ export default function App() {
               <input
                 type="email"
                 placeholder="you@example.com"
-                className="w-full border border-gray-300 rounded-xl pl-12 pr-4 pt-7 pb-3 focus:ring-2 focus:ring-[#253612]/50 focus:border-transparent transition"
+                // UPDATED: Darker border and slight shadow
+                className="w-full border border-gray-400 rounded-xl pl-12 pr-4 pt-7 pb-3 focus:ring-2 focus:ring-[#253612]/50 focus:border-transparent transition shadow-sm"
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={!isAuthReady}
               />
@@ -373,7 +384,8 @@ export default function App() {
               <label className="absolute left-12 top-2 text-xs text-gray-500">Password</label>
               <input
                 type={showPass ? "text" : "password"}
-                className="w-full border border-gray-300 rounded-xl pl-12 pr-12 pt-7 pb-3 focus:ring-2 focus:ring-[#253612]/50 focus:border-transparent transition"
+                // UPDATED: Darker border and slight shadow
+                className="w-full border border-gray-400 rounded-xl pl-12 pr-12 pt-7 pb-3 focus:ring-2 focus:ring-[#253612]/50 focus:border-transparent transition shadow-sm"
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={!isAuthReady}
               />
@@ -394,8 +406,13 @@ export default function App() {
             >
               Log In
             </button>
-            <div className="text-center text-sm">
-                <span className="text-gray-500 hover:text-[#253612] cursor-pointer underline">Forgot Password?</span>
+            <div className="text-center text-sm mt-4">
+                <span 
+                    onClick={() => console.log("Navigating to /forgot")} // Simulate navigation
+                    className="text-gray-500 hover:text-[#253612] cursor-pointer underline"
+                >
+                    Forgot Password?
+                </span>
             </div>
           </div>
         )}
@@ -405,7 +422,10 @@ export default function App() {
           <div className="space-y-4">
             <div className="mb-5">
               <label className="text-xs block mb-1 text-gray-500">Mobile Number (India: +91)</label>
-              <div className="flex items-center border border-gray-300 rounded-xl px-4 focus-within:ring-2 focus-within:ring-[#253612]/50 focus-within:border-transparent transition">
+              <div 
+                // UPDATED: Darker border and slight shadow
+                className="flex items-center border border-gray-400 rounded-xl px-4 focus-within:ring-2 focus-within:ring-[#253612]/50 focus-within:border-transparent transition shadow-sm"
+              >
                 <span className="font-medium pr-3 text-gray-700">+91</span>
                 <input
                   type="tel"
@@ -435,7 +455,8 @@ export default function App() {
                   <input
                     type="text"
                     maxLength={6}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#253612]/50 focus:border-transparent transition"
+                    // UPDATED: Darker border and slight shadow
+                    className="w-full border border-gray-400 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#253612]/50 focus:border-transparent transition shadow-sm"
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                     disabled={!isAuthReady}
                   />
@@ -448,11 +469,8 @@ export default function App() {
                 >
                   Verify & Login
                 </button>
-              </>
-            )}
-            
-            {otpSent && (
-                <div className="text-center">
+
+                <div className="text-center mt-3">
                     <button 
                         onClick={() => {setOtpSent(false); setOtp(""); setError(""); setSuccessMessage("");}}
                         className="text-sm text-gray-500 hover:text-[#253612] underline"
@@ -460,6 +478,7 @@ export default function App() {
                         Change Number or Resend
                     </button>
                 </div>
+              </>
             )}
           </div>
         )}
@@ -489,7 +508,10 @@ export default function App() {
 
         <p className="text-center mt-6 text-sm text-gray-700">
           Don’t have an account?{" "}
-          <span className="text-[#253612] underline font-medium cursor-pointer">
+          <span 
+            onClick={() => console.log("Navigating to /signup")} // Simulate navigation
+            className="text-[#253612] underline font-medium cursor-pointer"
+          >
             Create one
           </span>
         </p>
