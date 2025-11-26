@@ -36,8 +36,12 @@ const googleProvider = new GoogleAuthProvider();
 const RecaptchaVerifier = FRecaptchaVerifier;
 const signInWithPhoneNumber = FsignInWithPhoneNumber;
 
-// FIX: Removed conflicting global declaration for window.recaptchaVerifier
-// We will use type assertions in setupRecaptcha and loginWithOtp instead.
+// Extend the global Window interface locally within this file's scope
+// to correctly type Firebase phone auth properties, eliminating 'as any'.
+interface FirebaseWindow extends Window {
+    recaptchaVerifier?: FRecaptchaVerifier;
+    confirmationResult?: ConfirmationResult;
+}
 
 const setupFirebase = () => {
   let firebaseConfig: Record<string, string> = {}; 
@@ -97,6 +101,9 @@ export default function App() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  // Cast window to our safe, extended type
+  const w = window as unknown as FirebaseWindow;
+
   // Firebase Initialization and Auth Listener
   useEffect(() => {
     const initializedAuth = setupFirebase();
@@ -135,17 +142,14 @@ export default function App() {
   const setupRecaptcha = () => {
     if (!auth) throw new Error("Authentication service not initialized.");
     
-    // Use type assertion to access window property
-    const w = window as any;
-
-    if (!w.recaptchaVerifier) {
+    if (!w.recaptchaVerifier) { // Used w instead of (window as any)
       w.recaptchaVerifier = new RecaptchaVerifier(
         auth,
         "recaptcha-container",
         { size: "invisible" }
       );
     }
-    return w.recaptchaVerifier as FRecaptchaVerifier;
+    return w.recaptchaVerifier;
   };
 
   // --------------------------
@@ -169,8 +173,8 @@ export default function App() {
         verifier
       );
 
-      // Store the ConfirmationResult object using type assertion
-      (window as any).confirmationResult = confirmation; 
+      // Store the ConfirmationResult object using the typed 'w' object
+      w.confirmationResult = confirmation; // FIX 1: Removed (window as any)
       setOtpSent(true);
       showMessage("OTP Sent Successfully!");
     } catch (err: unknown) { 
@@ -187,7 +191,7 @@ export default function App() {
     setSuccessMessage("");
     if (!isAuthReady) return setError("Authentication not ready. Please wait.");
     
-    const confirmationResult = (window as any).confirmationResult as ConfirmationResult | undefined;
+    const confirmationResult = w.confirmationResult; // FIX 2: Removed (window as any)
 
     try {
       if (!otp) return setError("Enter OTP");
