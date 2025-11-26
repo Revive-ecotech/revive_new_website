@@ -52,11 +52,27 @@ const setupFirebase = () => {
       : {};
   } catch (e) {
     console.error("Error parsing __firebase_config:", e);
-    return null;
   }
   
+  // === DEBUG FALLBACK: START ===
+  // If no config is loaded from the environment, use a mock config to allow initialization.
+  // REMOVE THIS BLOCK in a production environment or when deployment variables are working.
   if (Object.keys(firebaseConfig).length === 0) {
-    console.error("Firebase configuration is missing.");
+      console.warn("Using DEBUG fallback Firebase configuration.");
+      firebaseConfig = {
+          apiKey: "MOCK-API-KEY",
+          authDomain: "mock-domain.firebaseapp.com",
+          projectId: "mock-project-id",
+          storageBucket: "mock-bucket.appspot.com",
+          messagingSenderId: "123456789012",
+          appId: "1:123456789012:web:mockid"
+      };
+  }
+  // === DEBUG FALLBACK: END ===
+  
+  // Re-check: If still missing, return null
+  if (Object.keys(firebaseConfig).length === 0) {
+    console.error("Firebase configuration is missing after all attempts.");
     return null;
   }
   
@@ -110,7 +126,10 @@ export default function App() {
     const initializedAuth = setupFirebase();
     
     // Assign window reference here, only on client mount
-    w = window as unknown as FirebaseWindow;
+    if (typeof window !== 'undefined') {
+        w = window as unknown as FirebaseWindow;
+    }
+
 
     if (!initializedAuth) {
         setError("Could not initialize Firebase. Configuration missing.");
@@ -142,8 +161,9 @@ export default function App() {
   
   // Helper to ensure window reference is available before use
   const getWindowReference = (): FirebaseWindow => {
-      if (!w) {
-          // This should technically never happen if called from an event handler after useEffect runs
+      // We check w for null only if we are sure we are on the client side.
+      // Since this is only called from click handlers after useEffect runs, w should be set.
+      if (w === null) { 
           throw new Error("Client environment (window) not initialized.");
       }
       return w;
