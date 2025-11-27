@@ -17,6 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Revive EcoTech",
   description: "Earn by recycling waste",
+  icons: {
+    icon: "/revive.ico?v=10",
+    shortcut: "/revive.ico?v=10",
+    apple: "/revive.ico?v=10",
+  },
 };
 
 export default function RootLayout({
@@ -27,11 +32,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* ⭐ Google Search Console Verification */}
+        {/* Google Search Console Verification */}
         <meta
           name="google-site-verification"
           content="ADlb8HGH4MnniAFAryH0KHNuH_7EMyNZtTA_hGJAT18"
         />
+
+        {/* Force favicon refresh */}
+        <link rel="icon" href="/revive.ico?v=10" />
       </head>
 
       <body
@@ -42,13 +50,8 @@ export default function RootLayout({
           bg-[#F2F7F2] text-[#253612]
         `}
       >
-        {/* Recaptcha container (Required for Firebase Phone Auth) */}
         <div id="recaptcha-container"></div>
-
-        {/* Firebase Auth Context Provider */}
         <AuthProvider>{children}</AuthProvider>
-
-        {/* Vercel Analytics */}
         <Analytics />
       </body>
     </html>

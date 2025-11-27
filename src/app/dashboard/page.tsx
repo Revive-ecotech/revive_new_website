@@ -3,12 +3,27 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
+import { useEffect } from "react";
 
 import { LogOut, Home, Package, List, Clock, User } from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, logout } = useAuth();
+
+  // ---------------------------
+  // 🔒 PROTECT DASHBOARD
+  // ---------------------------
+  useEffect(() => {
+    if (!user) {
+      router.push("/login"); // redirect if logged out
+    }
+  }, [user, router]);
+
+  const handleLogout = async () => {
+    await logout();         // clear session
+    router.push("/login");  // force redirect to login
+  };
 
   const profilePhoto =
     user?.photoURL && user.photoURL.trim() !== ""
@@ -17,8 +32,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F2F7F2]">
-
-      {/* ------------------ WRAPPER ------------------ */}
       <div className="flex flex-1">
 
         {/* ------------------ SIDEBAR ------------------ */}
@@ -88,7 +101,7 @@ export default function DashboardPage() {
           {/* Logout */}
           <div className="mt-auto">
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="w-full flex items-center justify-center gap-2 px-6 py-3
               bg-[#155E3A] text-white rounded-xl hover:bg-[#0A4A31] transition shadow-lg font-semibold"
             >
@@ -100,10 +113,9 @@ export default function DashboardPage() {
         {/* ------------------ MAIN CONTENT ------------------ */}
         <main className="flex-1 ml-72 p-12">
 
-          {/* Top Right: Home + Profile */}
+          {/* Top Right */}
           <div className="flex justify-end items-center gap-4 mb-8">
 
-            {/* HOME BUTTON */}
             <button
               onClick={() => router.push("/")}
               className="px-4 py-2 bg-[#1A7548] text-white rounded-xl font-semibold 
@@ -112,7 +124,6 @@ export default function DashboardPage() {
               <Home size={18} /> Home
             </button>
 
-            {/* PROFILE IMAGE */}
             <Image
               src={profilePhoto}
               alt="Profile"
@@ -124,7 +135,6 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Heading */}
           <h1 className="text-4xl font-extrabold text-[#0A4A31] mb-1">
             Dashboard
           </h1>
@@ -187,7 +197,7 @@ export default function DashboardPage() {
         </main>
       </div>
 
-      {/* ------------------ FOOTER ------------------ */}
+      {/* Footer */}
       <footer className="bg-[#2F5E3A] text-white py-6 w-full rounded-t-3xl mt-10 shadow-inner">
         <div className="text-center text-sm opacity-90">
           © {new Date().getFullYear()} Revive Ecotech Ltd

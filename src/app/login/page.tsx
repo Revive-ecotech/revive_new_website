@@ -128,9 +128,9 @@ export default function LoginPage() {
 
         {/* TOP LEFT LOGO */}
         <img
-          src="https://www.revives.in/_next/image?url=%2Flogo2.png&w=256&q=75"
+          src="/logo2.png"
           alt="Revive Logo"
-          className="h-14 mb-4 cursor-pointer"
+          className="h-14 mb-4 cursor-pointer object-contain"
           onClick={() => router.push("/")}
         />
 
@@ -201,29 +201,31 @@ export default function LoginPage() {
         {/* ---------------- EMAIL LOGIN ---------------- */}
         {mode === "email" && (
           <div className="space-y-5">
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 text-gray-500" size={18} />
+
+            {/* EMAIL INPUT */}
+            <div className="revive-input-group">
+              <Mail />
               <input
                 type="email"
                 placeholder="Email"
-                className="w-full pl-10 pr-4 py-3 rounded-xl border bg-gray-50 
-                           focus:ring-2 focus:ring-[#253612]"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 text-gray-500" size={18} />
+            {/* PASSWORD INPUT */}
+            <div className="revive-input-group relative">
+              <Lock />
               <input
                 type={showPass ? "text" : "password"}
                 placeholder="Password"
-                className="w-full pl-10 pr-12 py-3 rounded-xl border bg-gray-50 
-                           focus:ring-2 focus:ring-[#253612]"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
               <button
+                type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-3 text-gray-600"
+                className="absolute right-3"
               >
                 {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -250,7 +252,6 @@ export default function LoginPage() {
         {mode === "phone" && (
           <div className="space-y-5">
 
-            {/* +91 phone field */}
             <div className="flex items-center border border-gray-300 rounded-xl bg-gray-50 overflow-hidden">
               <span className="px-4 py-3 bg-[#F0F4EF] text-[#253612] font-semibold border-r border-gray-300">
                 +91

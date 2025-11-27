@@ -23,13 +23,12 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Prevent blue selection highlights */
 * {
   outline: none !important;
 }
 
 /* -------------------------------------------------------- */
-/*  🌿 Universal Input Styling                              */
+/*  🌿 Universal Input                                      */
 /* -------------------------------------------------------- */
 input, textarea, select {
   background: var(--revive-input-bg) !important;
@@ -48,7 +47,41 @@ select:focus {
 }
 
 /* -------------------------------------------------------- */
-/*  🌿 Revive Card Style                                     */
+/*  🌿 Revive Input Group (FIXED ICON ALIGNMENT)            */
+/* -------------------------------------------------------- */
+.revive-input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--revive-input-bg);
+  border: 1px solid var(--revive-border);
+  border-radius: 0.75rem;
+  padding: 10px 14px;
+  transition: all 0.2s ease;
+}
+
+.revive-input-group svg {
+  width: 20px;
+  height: 20px;
+  color: var(--revive-text);
+  flex-shrink: 0;
+}
+
+.revive-input-group input {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.revive-input-group:focus-within {
+  border-color: var(--revive-green) !important;
+  box-shadow: 0 0 0 3px rgba(37, 54, 18, 0.15);
+}
+
+/* -------------------------------------------------------- */
+/*  🌿 Revive Card                                           */
 /* -------------------------------------------------------- */
 .revive-card {
   background: white;
@@ -60,7 +93,7 @@ select:focus {
 }
 
 /* -------------------------------------------------------- */
-/*  🌿 Primary Button (Green)                                */
+/*  🌿 Buttons                                               */
 /* -------------------------------------------------------- */
 .revive-btn {
   background: var(--revive-green) !important;
@@ -78,9 +111,6 @@ select:focus {
   box-shadow: 0 6px 16px rgba(37, 54, 18, 0.35);
 }
 
-/* -------------------------------------------------------- */
-/*  🌿 Outline Button                                       */
-/* -------------------------------------------------------- */
 .revive-outline {
   border: 1.5px solid var(--revive-green);
   color: var(--revive-green);
@@ -95,31 +125,23 @@ select:focus {
 }
 
 /* -------------------------------------------------------- */
-/*  🌿 Fade-In Animation                                     */
+/*  🌿 Animations                                            */
 /* -------------------------------------------------------- */
 @keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.fade-in {
-  animation: fade-in 0.25s ease-out;
-}
+.fade-in { animation: fade-in 0.25s ease-out; }
 
 /* -------------------------------------------------------- */
-/*  ⭐ Dropdown Styling (Profile Menu, Popovers, etc.)       */
+/*  🌿 Dropdown                                              */
 /* -------------------------------------------------------- */
 .revive-dropdown {
   background: white;
   border: 1px solid var(--revive-border);
   border-radius: 1rem;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
   animation: fade-in 0.22s ease;
 }
 
@@ -134,7 +156,7 @@ select:focus {
   background: var(--revive-mint);
 }
 
-/* Logout option */
+/* Logout */
 .revive-dropdown .danger {
   color: #C62828 !important;
 }
@@ -143,23 +165,20 @@ select:focus {
 }
 
 /* -------------------------------------------------------- */
-/*  ⭐ Radix UI Select Fix                                   */
+/*  🌿 Radix Select Fix                                     */
 /* -------------------------------------------------------- */
 [data-radix-select-content] {
-  background: #ffffff !important;
+  background: white !important;
   border: 1px solid var(--revive-border) !important;
   border-radius: 0.75rem !important;
-  color: var(--revive-text) !important;
   padding: 4px 0 !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;
 }
 
 [data-radix-select-item] {
-  background: #ffffff !important;
   padding: 10px 14px !important;
   color: var(--revive-text) !important;
   border-radius: 6px !important;
-  font-size: 0.95rem !important;
 }
 
 [data-radix-select-item][data-highlighted] {
@@ -168,7 +187,7 @@ select:focus {
 }
 
 /* -------------------------------------------------------- */
-/*  🖼 Image Styling                                         */
+/*  🌿 Images                                                */
 /* -------------------------------------------------------- */
 img, .next-image {
   border-radius: 0.75rem;
