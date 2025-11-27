@@ -11,18 +11,15 @@ export default function DashboardPage() {
   const router = useRouter();
   const { user, logout } = useAuth();
 
-  // ---------------------------
-  // 🔒 PROTECT DASHBOARD
-  // ---------------------------
   useEffect(() => {
     if (!user) {
-      router.push("/login"); // redirect if logged out
+      router.push("/login");
     }
   }, [user, router]);
 
   const handleLogout = async () => {
-    await logout();         // clear session
-    router.push("/login");  // force redirect to login
+    await logout();
+    router.push("/login");
   };
 
   const profilePhoto =
@@ -35,7 +32,7 @@ export default function DashboardPage() {
       <div className="flex flex-1">
 
         {/* ------------------ SIDEBAR ------------------ */}
-        <aside className="w-72 bg-white border-r border-[#DDECE2] shadow-xl p-6 flex flex-col fixed h-screen">
+        <aside className="hidden md:flex w-72 bg-white border-r border-[#DDECE2] shadow-xl p-6 flex-col fixed h-screen">
 
           {/* Logo */}
           <div
@@ -110,11 +107,31 @@ export default function DashboardPage() {
           </div>
         </aside>
 
-        {/* ------------------ MAIN CONTENT ------------------ */}
-        <main className="flex-1 ml-72 p-12">
+        {/* ------------------ MOBILE NAVBAR ------------------ */}
+        <div className="md:hidden w-full bg-white p-4 shadow flex justify-between items-center fixed top-0 left-0 z-50">
+          <Image
+            src="/logo2.png"
+            alt="Revive EcoTech"
+            width={100}
+            height={40}
+            className="object-contain"
+          />
 
-          {/* Top Right */}
-          <div className="flex justify-end items-center gap-4 mb-8">
+          <Image
+            src={profilePhoto}
+            alt="Profile"
+            width={40}
+            height={40}
+            onClick={() => router.push("/dashboard/profile")}
+            className="cursor-pointer rounded-xl border border-[#1A7548]"
+          />
+        </div>
+
+        {/* ------------------ MAIN CONTENT ------------------ */}
+        <main className="flex-1 md:ml-72 p-6 md:p-12 mt-20 md:mt-0">
+
+          {/* Top Right (Desktop Only) */}
+          <div className="hidden md:flex justify-end items-center gap-4 mb-8">
 
             <button
               onClick={() => router.push("/")}
