@@ -20,15 +20,16 @@ import {
   query,
   where,
   getDocs,
+  getDoc,
 } from "firebase/firestore";
 
 // --------------------------------------------------
-// 1️⃣ Browser check to avoid "window is undefined"
+// Browser check
 // --------------------------------------------------
 const isBrowser = () => typeof window !== "undefined";
 
 // --------------------------------------------------
-// 2️⃣ Firebase Config
+// Firebase Config
 // --------------------------------------------------
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
@@ -40,7 +41,7 @@ const firebaseConfig = {
 };
 
 // --------------------------------------------------
-// 3️⃣ Init Firebase (Browser Only)
+// Initialize Firebase (Browser only)
 // --------------------------------------------------
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
@@ -53,7 +54,7 @@ if (isBrowser()) {
 }
 
 // --------------------------------------------------
-// 4️⃣ Safe Exported Getters
+// Export Safe Getters
 // --------------------------------------------------
 export function getAuthClient(): Auth {
   if (!auth) throw new Error("Firebase Auth is only available in the browser.");
@@ -66,24 +67,61 @@ export function getDB() {
 }
 
 // --------------------------------------------------
-// 5️⃣ Google Provider
+// Google Provider
 // --------------------------------------------------
 export const googleProvider = new GoogleAuthProvider();
 
 // --------------------------------------------------
-// 6️⃣ Phone Auth Exports
+// Phone Auth
 // --------------------------------------------------
-export {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  type ConfirmationResult,
-};
+export { RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult };
 
 // --------------------------------------------------
-// 7️⃣ 🔥 FIRESTORE WRITE FUNCTIONS
+// Username Generator (0–6 random chars)
 // --------------------------------------------------
+function generateUsername() {
+  const length = Math.floor(Math.random() * 7); // 0–6 chars
+  const randomStr = Math.random().toString(36).substring(2, 2 + length);
+  return randomStr || Math.random().toString(36).substring(2, 3); // ensure at least 1 char
+}
 
-// SAVE PICKUP REQUEST
+// --------------------------------------------------
+// SAVE USER PROFILE (Merge + Auto Username Only If Missing)
+// --------------------------------------------------
+export async function saveUserProfile(userId: string, data: any) {
+  const dbClient = getDB();
+  const userRef = doc(dbClient, "users", userId);
+
+  const existing = await getDoc(userRef);
+
+  let finalData = { ...data };
+
+  // Create username only on first time or if empty
+  if (!existing.exists() || !existing.data()?.username) {
+    finalData.username = generateUsername();
+    finalData.createdAt = serverTimestamp();
+  }
+
+  finalData.updatedAt = serverTimestamp();
+
+  // Merge to preserve other fields
+  return await setDoc(userRef, finalData, { merge: true });
+}
+
+// --------------------------------------------------
+// GET USER PROFILE
+// --------------------------------------------------
+export async function getUserProfile(userId: string) {
+  const dbClient = getDB();
+  const userRef = doc(dbClient, "users", userId);
+  const snap = await getDoc(userRef);
+
+  return snap.exists() ? snap.data() : null;
+}
+
+// --------------------------------------------------
+// SAVE PICKUP
+// --------------------------------------------------
 export async function savePickup(data: any) {
   const dbClient = getDB();
   const ref = collection(dbClient, "pickups");
@@ -94,7 +132,9 @@ export async function savePickup(data: any) {
   });
 }
 
+// --------------------------------------------------
 // SAVE PREVIOUS REQUEST
+// --------------------------------------------------
 export async function savePreviousRequest(userId: string, data: any) {
   const dbClient = getDB();
   const ref = collection(dbClient, "previousRequests");
@@ -106,22 +146,9 @@ export async function savePreviousRequest(userId: string, data: any) {
   });
 }
 
-// SAVE USER PROFILE
-export async function saveUserProfile(userId: string, data: any) {
-  const dbClient = getDB();
-  const userRef = doc(dbClient, "users", userId);
-
-  return await setDoc(userRef, {
-    ...data,
-    updatedAt: serverTimestamp(),
-  });
-}
-
 // --------------------------------------------------
-// 8️⃣ 🔥 FIRESTORE READ FUNCTIONS
-// --------------------------------------------------
-
 // GET USER PICKUPS
+// --------------------------------------------------
 export async function getUserPickups(userId: string) {
   const dbClient = getDB();
   const ref = collection(dbClient, "pickups");
@@ -132,7 +159,9 @@ export async function getUserPickups(userId: string) {
   return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
+// --------------------------------------------------
 // GET USER PREVIOUS REQUESTS
+// --------------------------------------------------
 export async function getUserPrevious(userId: string) {
   const dbClient = getDB();
   const ref = collection(dbClient, "previousRequests");
@@ -144,6 +173,6 @@ export async function getUserPrevious(userId: string) {
 }
 
 // --------------------------------------------------
-// 9️⃣ Export instances (optional)
+// Export Instances (optional)
 // --------------------------------------------------
 export { auth, db };
