@@ -3,7 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, Home } from "lucide-react";
+
+// Icons
+import {
+  ArrowLeft,
+  ArrowRight,
+  Home,
+  MapPin,
+  Calendar,
+  Clock as ClockIcon,
+  NotebookPen,
+  List as ListIcon,
+} from "lucide-react";
 
 type Category = "Paper" | "Plastic" | "Glass" | "Metals" | "E-waste";
 type Unit = "kg" | "piece";
@@ -37,6 +48,7 @@ export default function PickupSummaryPage() {
   const router = useRouter();
   const [data, setData] = useState<PickupPayload | null>(null);
 
+  // Load pickup data
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
@@ -58,10 +70,8 @@ export default function PickupSummaryPage() {
 
   const grandTotal = useMemo(
     () =>
-      data?.items.reduce(
-        (sum, item) => sum + (item.estimatedAmount || 0),
-        0
-      ) ?? 0,
+      data?.items.reduce((sum, item) => sum + (item.estimatedAmount || 0), 0) ??
+      0,
     [data]
   );
 
@@ -69,6 +79,7 @@ export default function PickupSummaryPage() {
 
   return (
     <main className="min-h-screen bg-[#F2F7F2] pb-28">
+
       {/* HEADER */}
       <header className="w-full py-5 px-10 flex items-center justify-between border-b border-[#DDECE2] bg-white shadow-sm">
         <Image src="/logo.png" width={160} height={80} alt="Revive Logo" />
@@ -101,9 +112,10 @@ export default function PickupSummaryPage() {
       </div>
 
       {/* CARD */}
-      <div className="max-w-3xl mx-auto bg-white border border-[#DDECE2] rounded-3xl shadow-xl mt-10 p-10 space-y-10">
+      <div className="max-w-3xl mx-auto bg-white border border-[#DDECE2] rounded-3xl shadow-2xl mt-12 p-10 space-y-10">
+
         {/* ITEMS TABLE */}
-        <div>
+        <section>
           <h2 className="text-2xl font-bold text-[#0A4A31] mb-5">
             Selected Items
           </h2>
@@ -119,6 +131,7 @@ export default function PickupSummaryPage() {
                   <th className="py-3 px-4">Est. Amount</th>
                 </tr>
               </thead>
+
               <tbody>
                 {data.items.map((item, index) => (
                   <tr key={`${item.subItemId}-${index}`} className="border-t">
@@ -133,63 +146,98 @@ export default function PickupSummaryPage() {
                     <td className="py-3 px-4">₹{item.estimatedAmount}</td>
                   </tr>
                 ))}
+
+                {/* TOTAL ROW */}
                 <tr className="border-t bg-[#F9FCF9] font-semibold">
                   <td className="py-3 px-4" colSpan={4}>
                     Total Estimated Amount
                   </td>
-                  <td className="py-3 px-4">₹{grandTotal.toFixed(2)}</td>
+                  <td className="py-3 px-4 text-[#0A4A31]">
+                    ₹{grandTotal.toFixed(2)}
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
 
         {/* DETAILS */}
-        <div className="space-y-3">
-          <h2 className="text-2xl font-bold text-[#0A4A31] mb-2">
+        <section className="space-y-5">
+          <h2 className="text-2xl font-bold text-[#0A4A31]">
             Pickup Details
           </h2>
 
-          <p className="text-lg">
-            <span className="font-bold text-[#0A4A31]">Pickup Address: </span>
-            {data.addressDetails.fullAddress}
-          </p>
+          {/* Address */}
+          <div className="flex gap-3 text-lg">
+            <MapPin size={24} className="text-[#1A7548] min-w-[24px]" />
+            <div>
+              <span className="font-bold text-[#0A4A31]">Address: </span>
+              {data.addressDetails.fullAddress}
+            </div>
+          </div>
 
-          <p className="text-lg">
-            <span className="font-bold text-[#0A4A31]">Pickup Date: </span>
-            {data.pickupDate}
-          </p>
+          {/* Date */}
+          <div className="flex gap-3 text-lg">
+            <Calendar size={24} className="text-[#1A7548] min-w-[24px]" />
+            <div>
+              <span className="font-bold text-[#0A4A31]">Pickup Date: </span>
+              {data.pickupDate}
+            </div>
+          </div>
 
-          <p className="text-lg">
-            <span className="font-bold text-[#0A4A31]">Pickup Time: </span>
-            {data.time}
-          </p>
+          {/* Time */}
+          <div className="flex gap-3 text-lg">
+            <ClockIcon size={24} className="text-[#1A7548] min-w-[24px]" />
+            <div>
+              <span className="font-bold text-[#0A4A31]">Pickup Time: </span>
+              {data.time}
+            </div>
+          </div>
 
-          {data.description && (
-            <p className="text-lg">
+          {/* Items (Improved List) */}
+          <div className="flex gap-3 text-lg">
+            <ListIcon size={24} className="text-[#1A7548] min-w-[24px]" />
+            <div>
+              <span className="font-bold text-[#0A4A31]">Items:</span>
+              <ul className="list-disc ml-6 mt-1 text-[#0A4A31] space-y-1">
+                {data.items.map((item, i) => (
+                  <li key={i}>
+                    {item.subItemName} ({item.quantity} {item.unit})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div className="flex gap-3 text-lg">
+            <NotebookPen size={24} className="text-[#1A7548] min-w-[24px]" />
+            <div>
               <span className="font-bold text-[#0A4A31]">Notes: </span>
-              {data.description}
-            </p>
-          )}
-        </div>
+              {data.description || "No notes added"}
+            </div>
+          </div>
+        </section>
       </div>
 
-      {/* BUTTONS */}
+      {/* FOOTER BUTTONS */}
       <div className="flex flex-col md:flex-row justify-center gap-6 mt-10 px-4">
-        {/* Edit Pickup */}
+        {/* EDIT BTN */}
         <button
           onClick={() => router.push("/schedule-pickup?edit=1")}
-          className="px-8 py-4 bg-white border border-[#DDECE2] rounded-xl text-[#0A4A31] font-semibold shadow-md hover:bg-gray-50 flex items-center gap-2 justify-center"
+          className="px-8 py-4 bg-white border border-[#DDECE2] rounded-xl 
+          text-[#0A4A31] font-semibold shadow-md hover:bg-gray-50 flex items-center gap-2"
         >
           <ArrowLeft size={18} /> Edit Pickup
         </button>
 
-        {/* Confirm */}
+        {/* CONFIRM BTN */}
         <button
           onClick={() => router.push("/schedule-pickup/success")}
-          className="px-8 py-4 bg-[#1A7548] rounded-xl text-white font-bold shadow-md hover:bg-[#155E3A] flex items-center gap-2 justify-center"
+          className="px-8 py-4 bg-[#1A7548] rounded-xl text-white font-bold 
+          shadow-md hover:bg-[#155E3A] flex items-center gap-2"
         >
-          Confirm Pickup <ArrowRight size={18} />
+          Confirm & Save Pickup <ArrowRight size={18} />
         </button>
       </div>
     </main>

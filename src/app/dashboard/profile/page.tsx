@@ -10,7 +10,7 @@ import { saveUserProfile } from "@/lib/firebase";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const defaultAvatar = "/default-avatar.png";
 
@@ -27,9 +27,7 @@ export default function ProfilePage() {
     setPhone(user?.phoneNumber || "");
   }, [user]);
 
-  // ---------------------------
-  // 🔥 Save to Firebase
-  // ---------------------------
+  // Save to Firebase
   const handleSave = async () => {
     if (!user?.uid) return;
 
@@ -52,13 +50,19 @@ export default function ProfilePage() {
     setLoading(false);
   };
 
+  // Logout handler
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+  };
+
   return (
     <div className="min-h-screen bg-[#F2F7F2] flex justify-center p-6 md:p-10">
 
       {/* ================= PROFILE CARD ================= */}
       <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-xl border border-[#DDECE2] p-8 md:p-10">
 
-        {/* ---- Go to Dashboard Button ---- */}
+        {/* Go to Dashboard Button */}
         <button
           onClick={() => router.push("/dashboard")}
           className="absolute top-6 right-6 px-5 py-2 bg-[#1A7548] text-white font-semibold 
@@ -85,7 +89,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ================= FORM ================= */}
+        {/* FORM */}
         <div className="space-y-6">
 
           {/* NAME */}
@@ -147,6 +151,16 @@ export default function ProfilePage() {
               ✔ Profile updated successfully!
             </p>
           )}
+
+          {/* LOGOUT BUTTON — GREEN THEME */}
+          <button
+            onClick={handleLogout}
+            className="w-full py-3 bg-[#1A7548] text-white rounded-xl font-bold
+            hover:bg-[#155E3A] transition shadow-md mt-4"
+          >
+            Logout
+          </button>
+
         </div>
       </div>
     </div>
