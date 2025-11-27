@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { useEffect } from "react";
 
-import { LogOut, Home, Package, List, Clock, User } from "lucide-react";
+import {
+  LogOut,
+  Home,
+  Package,
+  Clock,
+  User,
+  Tags,
+} from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -66,25 +73,20 @@ export default function DashboardPage() {
               <Package size={20} /> Schedule Pickup
             </button>
 
+            {/* NEW Price List */}
             <button
-              onClick={() => router.push("/summary")}
+              onClick={() => router.push("/price-list")}
               className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#E3F3E8] transition"
             >
-              <List size={20} /> Summary
+              <Tags size={20} /> Price List
             </button>
 
+            {/* NEW History */}
             <button
-              onClick={() => router.push("/previous-requests")}
+              onClick={() => router.push("/history")}
               className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#E3F3E8] transition"
             >
-              <Clock size={20} /> Previous Requests
-            </button>
-
-            <button
-              onClick={() => router.push("/pickup-history")}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#E3F3E8] transition"
-            >
-              <Clock size={20} /> Pickup History
+              <Clock size={20} /> History
             </button>
 
             <button
@@ -152,6 +154,7 @@ export default function DashboardPage() {
             />
           </div>
 
+          {/* Heading */}
           <h1 className="text-4xl font-extrabold text-[#0A4A31] mb-1">
             Dashboard
           </h1>
@@ -177,37 +180,26 @@ export default function DashboardPage() {
               <p className="text-white/80 mt-2">Book a pickup for recyclables.</p>
             </div>
 
-            {/* Summary */}
+            {/* Price List */}
             <div
-              onClick={() => router.push("/summary")}
+              onClick={() => router.push("/price-list")}
               className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg 
               hover:shadow-2xl hover:-translate-y-1 transition"
             >
-              <List size={32} className="text-[#1A7548]" />
-              <h2 className="text-2xl font-bold text-[#0A4A31] mt-4">View Summary</h2>
-              <p className="text-[#517264] mt-2">Review selected materials.</p>
+              <Tags size={32} className="text-[#1A7548]" />
+              <h2 className="text-2xl font-bold text-[#0A4A31] mt-4">Price List</h2>
+              <p className="text-[#517264] mt-2">Check current scrap rates.</p>
             </div>
 
-            {/* Previous Requests */}
+            {/* History */}
             <div
-              onClick={() => router.push("/previous-requests")}
+              onClick={() => router.push("/history")}
               className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg 
               hover:shadow-2xl hover:-translate-y-1 transition"
             >
               <Clock size={32} className="text-[#1A7548]" />
-              <h2 className="text-2xl font-bold text-[#0A4A31] mt-4">Previous Requests</h2>
-              <p className="text-[#517264] mt-2">Check your past bookings.</p>
-            </div>
-
-            {/* Pickup History */}
-            <div
-              onClick={() => router.push("/pickup-history")}
-              className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg 
-              hover:shadow-2xl hover:-translate-y-1 transition"
-            >
-              <Clock size={32} className="text-[#1A7548]" />
-              <h2 className="text-2xl font-bold text-[#0A4A31] mt-4">Pickup History</h2>
-              <p className="text-[#517264] mt-2">Completed pickups timeline.</p>
+              <h2 className="text-2xl font-bold text-[#0A4A31] mt-4">History</h2>
+              <p className="text-[#517264] mt-2">Your completed and upcoming pickups.</p>
             </div>
 
           </div>

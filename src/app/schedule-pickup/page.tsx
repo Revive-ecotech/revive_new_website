@@ -13,7 +13,6 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { savePickup } from "@/lib/firebase";
 import { useAuth } from "@/app/context/AuthContext";
 
 // ---------- Types ----------
@@ -39,11 +38,7 @@ interface ScrapSelection {
 
 interface PickupPayload {
   userId: string;
-  addressDetails: {
-    fullAddress: string;
-    line1?: string;
-    addressType?: string;
-  };
+  addressDetails: { fullAddress: string };
   pickupDate: string;
   time: string;
   description?: string;
@@ -79,14 +74,7 @@ const SCRAP_CONFIG: Record<Category, SubItemConfig[]> = {
   ],
 };
 
-const CATEGORIES: Category[] = [
-  "Paper",
-  "Plastic",
-  "Glass",
-  "Metals",
-  "E-waste",
-];
-
+const CATEGORIES: Category[] = ["Paper", "Plastic", "Glass", "Metals", "E-waste"];
 const STORAGE_KEY = "pickup-data";
 
 export default function SchedulePickupPage() {
@@ -94,7 +82,6 @@ export default function SchedulePickupPage() {
   const searchParams = useSearchParams();
   const { user } = useAuth();
 
-  // ---------- States ----------
   const [address, setAddress] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -116,25 +103,25 @@ export default function SchedulePickupPage() {
     try {
       const parsed = JSON.parse(stored) as PickupPayload;
 
-      if (shouldPrefill || (!address && !date && !time && items.length === 0)) {
-        setAddress(parsed.addressDetails?.fullAddress ?? "");
-        setDate(parsed.pickupDate ?? "");
-        setTime(parsed.time ?? "");
+      if (shouldPrefill) {
+        setAddress(parsed.addressDetails.fullAddress);
+        setDate(parsed.pickupDate);
+        setTime(parsed.time);
         setNotes(parsed.description ?? "");
         setItems(parsed.items ?? []);
       }
     } catch {}
   }, []);
 
-  // ---------- Item remove ----------
+  // ---------- Remove Item ----------
   const removeItem = (index: number) => {
     setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
   // ---------- Submit ----------
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!address || !date || !time || items.length === 0) {
-      alert("Please fill all details and add scrap items.");
+      alert("Fill all details.");
       return;
     }
 
@@ -145,7 +132,7 @@ export default function SchedulePickupPage() {
 
     const payload: PickupPayload = {
       userId: user.uid,
-      addressDetails: { fullAddress: address, line1: "", addressType: "Home" },
+      addressDetails: { fullAddress: address },
       pickupDate: date,
       time,
       description: notes,
@@ -156,7 +143,7 @@ export default function SchedulePickupPage() {
     router.push("/schedule-pickup/summary");
   };
 
-  // ---------- Modal logic ----------
+  // ---------- Modal Logic ----------
   const openCategoryModal = (category: Category) => {
     setActiveCategory(category);
     const first = SCRAP_CONFIG[category][0];
@@ -172,14 +159,9 @@ export default function SchedulePickupPage() {
     setQuantity(1);
   };
 
-  const currentSubItems =
-    (activeCategory && SCRAP_CONFIG[activeCategory]) || [];
-  const selectedSubItem =
-    currentSubItems.find((s) => s.id === selectedSubItemId) ||
-    currentSubItems[0];
-
-  const estimatedAmount =
-    selectedSubItem ? selectedSubItem.rate * quantity : 0;
+  const currentSubItems = activeCategory ? SCRAP_CONFIG[activeCategory] : [];
+  const selectedSubItem = currentSubItems.find((s) => s.id === selectedSubItemId);
+  const estimatedAmount = selectedSubItem ? selectedSubItem.rate * quantity : 0;
 
   return (
     <main className="min-h-screen bg-[#F2F7F2] pb-24">
@@ -209,7 +191,56 @@ export default function SchedulePickupPage() {
       {/* MAIN FORM */}
       <div className="max-w-2xl bg-white rounded-3xl shadow-xl mx-auto mt-12 p-10 border space-y-10">
 
-        {/* PICKUP ITEMS */}
+        {/* ADDRESS */}
+        <section>
+          <h2 className="flex items-center gap-3 text-2xl font-bold text-[#0A4A31] mb-4">
+            <MapPin size={26} className="text-[#1A7548]" />
+            Pickup Location
+          </h2>
+
+          <input
+            type="text"
+            placeholder="Enter complete pickup address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            className="w-full px-5 py-4 bg-gray-50 border rounded-xl outline-none 
+            focus:ring-2 focus:ring-[#1A7548]"
+          />
+        </section>
+
+        {/* DATE & TIME */}
+        <section>
+          <h2 className="flex items-center gap-3 text-2xl font-bold text-[#0A4A31] mb-4">
+            <Calendar size={26} className="text-[#1A7548]" />
+            Pickup Date & Time
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div className="flex items-center gap-3 bg-gray-50 border rounded-xl px-4 py-3">
+              <Calendar size={20} className="text-gray-500" />
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="bg-transparent w-full outline-none"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 bg-gray-50 border rounded-xl px-4 py-3">
+              <Clock size={20} className="text-gray-500" />
+              <input
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="bg-transparent w-full outline-none"
+              />
+            </div>
+
+          </div>
+        </section>
+
+        {/* SCRAP ITEMS */}
         <section>
           <h2 className="flex items-center gap-3 text-2xl font-bold text-[#0A4A31] mb-4">
             <Recycle size={26} className="text-[#1A7548]" /> Add Scrap Items
@@ -245,14 +276,14 @@ export default function SchedulePickupPage() {
                   {items.map((item, idx) => (
                     <tr key={idx} className="border-t">
 
-                      {/* TRASH ICON BUTTON */}
+                      {/* Green Trash Button */}
                       <td className="py-2 px-4">
                         <button
                           type="button"
                           onClick={() => removeItem(idx)}
-                          className="p-2 rounded-lg hover:bg-red-100 transition"
+                          className="p-2 rounded-lg hover:bg-[#E8F6EE] transition"
                         >
-                          <Trash2 size={18} className="text-red-600" />
+                          <Trash2 size={18} className="text-[#1A7548]" />
                         </button>
                       </td>
 
@@ -276,11 +307,12 @@ export default function SchedulePickupPage() {
           <h2 className="flex items-center gap-3 text-2xl font-bold text-[#0A4A31] mb-3">
             <FileText size={26} className="text-[#1A7548]" /> Additional Notes
           </h2>
+
           <textarea
-            placeholder="e.g. Please ring bell at arrival"
+            placeholder="Optional message..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full bg-gray-50 border rounded-xl p-4 outline-none"
+            className="w-full bg-gray-50 border rounded-xl p-4 outline-none focus:ring-2 focus:ring-[#1A7548]"
             rows={4}
           />
         </section>
@@ -319,7 +351,7 @@ export default function SchedulePickupPage() {
               ))}
             </div>
 
-            {/* Quantity */}
+            {/* Quantity Selector */}
             <div className="mb-4">
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-semibold">Estimated Amount</span>
@@ -357,7 +389,6 @@ export default function SchedulePickupPage() {
 
               <button
                 onClick={() => {
-                  if (!activeCategory || !selectedSubItem) return;
                   setItems((prev) => [
                     ...prev,
                     {
