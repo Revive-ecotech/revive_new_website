@@ -92,7 +92,7 @@ export default function PriceListPage() {
           onClick={() => router.back()}
           className="flex items-center gap-2 bg-[#1A7548] text-white px-6 py-2 rounded-full shadow"
         >
-          <ArrowLeft size={18} /> Back to Dashboard
+          <ArrowLeft size={18} /> Back
         </button>
       </header>
 

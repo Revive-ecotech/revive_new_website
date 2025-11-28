@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Mail, Phone } from "lucide-react";
+
+import { Mail, Phone, ArrowLeft } from "lucide-react";
 
 export default function HelpSupportPage() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function HelpSupportPage() {
 
       {/* -------- TOP BAR -------- */}
       <header className="w-full bg-white px-6 py-4 shadow-sm flex justify-between items-center border-b border-[#DDECE2]">
+        
         {/* Logo */}
         <Image
           src="/logo2.png"
@@ -22,12 +24,12 @@ export default function HelpSupportPage() {
           onClick={() => router.push("/")}
         />
 
-        {/* Back to Dashboard Button */}
+        {/* Back Button */}
         <button
           onClick={() => router.push("/dashboard")}
           className="flex items-center gap-2 bg-[#1A7548] text-white px-5 py-2 rounded-full shadow hover:bg-[#155E3A] transition font-semibold"
         >
-          ← Back to Dashboard
+          <ArrowLeft size={18} /> Back
         </button>
       </header>
 
@@ -66,8 +68,8 @@ export default function HelpSupportPage() {
         </div>
       </div>
 
-      {/* -------- RECTANGULAR COPYRIGHT BOX (Your Required Style) -------- */}
-      <div className="max-w-3xl mx-auto mt-16 bg-[#2F5E3A] rounded-3xl shadow-inner w-full">
+      {/* -------- RECTANGULAR COPYRIGHT BOX -------- */}
+      <div className="max-w-5xl mx-auto mt-16 bg-[#2F5E3A] rounded-3xl shadow-inner w-full px-6">
         <div className="text-center text-white py-6 text-sm tracking-wide">
           © {new Date().getFullYear()} Revive Ecotech Ltd
         </div>

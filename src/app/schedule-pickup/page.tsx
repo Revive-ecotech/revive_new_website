@@ -214,7 +214,7 @@ export default function SchedulePickupPage() {
           onClick={() => router.push("/dashboard")}
           className="flex items-center gap-2 bg-[#1A7548] text-white px-6 py-2 rounded-full shadow hover:bg-[#155E3A]"
         >
-          <ArrowLeft size={18} /> Back to Dashboard
+          <ArrowLeft size={18} /> Back
         </button>
       </header>
 

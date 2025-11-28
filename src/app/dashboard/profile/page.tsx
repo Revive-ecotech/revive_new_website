@@ -88,7 +88,7 @@ export default function ProfilePage() {
           className="absolute top-6 right-6 px-5 py-2 bg-[#1A7548] text-white font-semibold 
           rounded-xl shadow-md hover:bg-[#155E3A] transition flex items-center gap-2"
         >
-          <Home size={18} /> Dashboard
+          <Home size={25} />
         </button>
 
         <h1 className="text-4xl font-extrabold text-[#0A4A31]">Profile</h1>

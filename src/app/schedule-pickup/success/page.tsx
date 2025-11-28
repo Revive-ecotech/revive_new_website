@@ -24,7 +24,7 @@ export default function PickupSuccessPage() {
           onClick={() => router.push("/dashboard")}
           className="text-[#0A4A31] font-semibold hover:underline"
         >
-          Back to Dashboard
+          Dashboard
         </button>
       </header>
 

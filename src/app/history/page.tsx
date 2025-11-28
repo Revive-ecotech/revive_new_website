@@ -125,7 +125,7 @@ export default function HistoryPage() {
           rounded-full shadow hover:bg-[#155E3A] transition"
         >
           <ArrowLeft size={18} />
-          Back to Dashboard
+          Back
         </button>
       </div>
 
