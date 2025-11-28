@@ -21,16 +21,17 @@ import {
   where,
   getDocs,
   getDoc,
+  Firestore,
 } from "firebase/firestore";
 
-// --------------------------------------------------
-// Browser check
-// --------------------------------------------------
+// ----------------------------------------------
+// Browser Environment Check
+// ----------------------------------------------
 const isBrowser = () => typeof window !== "undefined";
 
-// --------------------------------------------------
+// ----------------------------------------------
 // Firebase Config
-// --------------------------------------------------
+// ----------------------------------------------
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
@@ -40,12 +41,12 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
 
-// --------------------------------------------------
-// Initialize Firebase (Browser only)
-// --------------------------------------------------
+// ----------------------------------------------
+// Initialize Firebase (SSR Safe)
+// ----------------------------------------------
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
-let db: ReturnType<typeof getFirestore> | null = null;
+let db: Firestore | null = null;
 
 if (isBrowser()) {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
@@ -53,126 +54,117 @@ if (isBrowser()) {
   db = getFirestore(app);
 }
 
-// --------------------------------------------------
-// Export Safe Getters
-// --------------------------------------------------
+// ----------------------------------------------
+// Safe Getters (Prevents SSR Errors in Vercel)
+// ----------------------------------------------
 export function getAuthClient(): Auth {
-  if (!auth) throw new Error("Firebase Auth is only available in the browser.");
+  if (!auth) throw new Error("Firebase Auth is not available (SSR).");
   return auth;
 }
 
-export function getDB() {
-  if (!db) throw new Error("Firestore is only available in the browser.");
+export function getDB(): Firestore {
+  if (!db) throw new Error("Firestore is not available (SSR).");
   return db;
 }
 
-// --------------------------------------------------
-// Google Provider
-// --------------------------------------------------
+// ----------------------------------------------
+// Google Auth Provider
+// ----------------------------------------------
 export const googleProvider = new GoogleAuthProvider();
 
-// --------------------------------------------------
-// Phone Auth
-// --------------------------------------------------
+// ----------------------------------------------
+// Phone Auth (Export)
+// ----------------------------------------------
 export { RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult };
 
-// --------------------------------------------------
-// Username Generator (0–6 random chars)
-// --------------------------------------------------
-function generateUsername() {
-  const length = Math.floor(Math.random() * 7); // 0–6 chars
-  const randomStr = Math.random().toString(36).substring(2, 2 + length);
-  return randomStr || Math.random().toString(36).substring(2, 3); // ensure at least 1 char
+// ----------------------------------------------
+// Username Generator
+// ----------------------------------------------
+function generateUsername(): string {
+  const length = Math.floor(Math.random() * 7);
+  const result = Math.random().toString(36).substring(2, 2 + length);
+  return result || Math.random().toString(36).substring(2, 3);
 }
 
-// --------------------------------------------------
-// SAVE USER PROFILE (Merge + Auto Username Only If Missing)
-// --------------------------------------------------
-export async function saveUserProfile(userId: string, data: any) {
+// ----------------------------------------------
+// SAVE USER PROFILE
+// ----------------------------------------------
+export async function saveUserProfile(userId: string, data: Record<string, any>) {
   const dbClient = getDB();
   const userRef = doc(dbClient, "users", userId);
 
   const existing = await getDoc(userRef);
 
-  let finalData = { ...data };
+  const finalData: Record<string, any> = {
+    ...data,
+    updatedAt: serverTimestamp(),
+  };
 
-  // Create username only on first time or if empty
   if (!existing.exists() || !existing.data()?.username) {
     finalData.username = generateUsername();
     finalData.createdAt = serverTimestamp();
   }
 
-  finalData.updatedAt = serverTimestamp();
-
-  // Merge to preserve other fields
-  return await setDoc(userRef, finalData, { merge: true });
+  return setDoc(userRef, finalData, { merge: true });
 }
 
-// --------------------------------------------------
+// ----------------------------------------------
 // GET USER PROFILE
-// --------------------------------------------------
+// ----------------------------------------------
 export async function getUserProfile(userId: string) {
   const dbClient = getDB();
-  const userRef = doc(dbClient, "users", userId);
-  const snap = await getDoc(userRef);
-
+  const snap = await getDoc(doc(dbClient, "users", userId));
   return snap.exists() ? snap.data() : null;
 }
 
-// --------------------------------------------------
+// ----------------------------------------------
 // SAVE PICKUP
-// --------------------------------------------------
-export async function savePickup(data: any) {
+// ----------------------------------------------
+export async function savePickup(data: Record<string, any>) {
   const dbClient = getDB();
-  const ref = collection(dbClient, "pickups");
-
-  return await addDoc(ref, {
+  return addDoc(collection(dbClient, "pickups"), {
     ...data,
     createdAt: serverTimestamp(),
   });
 }
 
-// --------------------------------------------------
+// ----------------------------------------------
 // SAVE PREVIOUS REQUEST
-// --------------------------------------------------
-export async function savePreviousRequest(userId: string, data: any) {
+// ----------------------------------------------
+export async function savePreviousRequest(userId: string, data: Record<string, any>) {
   const dbClient = getDB();
-  const ref = collection(dbClient, "previousRequests");
-
-  return await addDoc(ref, {
+  return addDoc(collection(dbClient, "previousRequests"), {
     userId,
     ...data,
     createdAt: serverTimestamp(),
   });
 }
 
-// --------------------------------------------------
+// ----------------------------------------------
 // GET USER PICKUPS
-// --------------------------------------------------
+// ----------------------------------------------
 export async function getUserPickups(userId: string) {
   const dbClient = getDB();
   const ref = collection(dbClient, "pickups");
-
   const q = query(ref, where("userId", "==", userId));
-  const snap = await getDocs(q);
 
-  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// --------------------------------------------------
+// ----------------------------------------------
 // GET USER PREVIOUS REQUESTS
-// --------------------------------------------------
+// ----------------------------------------------
 export async function getUserPrevious(userId: string) {
   const dbClient = getDB();
   const ref = collection(dbClient, "previousRequests");
-
   const q = query(ref, where("userId", "==", userId));
-  const snap = await getDocs(q);
 
-  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// --------------------------------------------------
-// Export Instances (optional)
-// --------------------------------------------------
-export { auth, db };
+// ----------------------------------------------
+// Export Firebase Instances (Browser Only)
+// ----------------------------------------------
+export { app, auth, db };

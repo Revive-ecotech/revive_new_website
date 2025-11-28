@@ -3,25 +3,41 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import {
-  LogOut,
-  Home,
-  Package,
-  Clock,
-  User,
-  Tags,
-} from "lucide-react";
+import { Power, Package, Clock, Tags, HelpCircle } from "lucide-react";
+import { getUserProfile } from "@/lib/firebase";
+
+interface UserProfile {
+  username: string;
+  email?: string;
+  phone?: string;
+}
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, logout } = useAuth();
 
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  // Load user profile from Firestore
   useEffect(() => {
-    if (!user) {
-      router.push("/login");
-    }
+    if (!user?.uid) return;
+
+    (async () => {
+      const profile = await getUserProfile(user.uid);
+      if (profile) {
+        setUserProfile({
+          username: profile.username || "User",
+          email: profile.email || "",
+          phone: profile.phone || "",
+        });
+      }
+    })();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) router.push("/login");
   }, [user, router]);
 
   const handleLogout = async () => {
@@ -29,189 +45,119 @@ export default function DashboardPage() {
     router.push("/login");
   };
 
-  const profilePhoto =
-    user?.photoURL && user.photoURL.trim() !== ""
-      ? user.photoURL
-      : "/default-avatar.png";
+  // Default fixed profile icon
+  const profilePhoto = "/default-green-profile.png";
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F2F7F2]">
-      <div className="flex flex-1">
+    <main className="min-h-screen bg-[#F2F7F2] pb-20">
 
-        {/* ------------------ SIDEBAR ------------------ */}
-        <aside className="hidden md:flex w-72 bg-white border-r border-[#DDECE2] shadow-xl p-6 flex-col fixed h-screen">
+      {/* ---------- TOP NAV BAR ---------- */}
+      <header className="w-full bg-white px-6 py-4 shadow-sm flex justify-between items-center border-b border-[#DDECE2]">
+        <Image
+          src="/logo2.png"
+          alt="Revive"
+          width={140}
+          height={50}
+          className="cursor-pointer"
+          onClick={() => router.push("/")}
+        />
 
-          {/* Logo */}
-          <div
-            className="flex justify-center mb-10 cursor-pointer"
-            onClick={() => router.push("/")}
+        <div className="flex items-center gap-4">
+          {/* Help & Support */}
+          <button
+            onClick={() => router.push("/help-support")}
+            className="p-2 bg-[#1A7548] hover:bg-[#155E3A] transition rounded-full shadow"
+            title="Help & Support"
           >
-            <Image
-              src="/logo2.png"
-              alt="Revive EcoTech"
-              width={150}
-              height={150}
-              priority
-              className="object-contain drop-shadow-md"
-            />
-          </div>
-
-          {/* Menu */}
-          <nav className="flex flex-col gap-3 text-[#0A4A31] font-semibold">
-
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#E3F3E8] transition"
-            >
-              <Home size={20} /> Dashboard
-            </button>
-
-            <button
-              onClick={() => router.push("/schedule-pickup")}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#E3F3E8] transition"
-            >
-              <Package size={20} /> Schedule Pickup
-            </button>
-
-            {/* NEW Price List */}
-            <button
-              onClick={() => router.push("/price-list")}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#E3F3E8] transition"
-            >
-              <Tags size={20} /> Price List
-            </button>
-
-            {/* NEW History */}
-            <button
-              onClick={() => router.push("/history")}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#E3F3E8] transition"
-            >
-              <Clock size={20} /> History
-            </button>
-
-            <button
-              onClick={() => router.push("/dashboard/profile")}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#E3F3E8] transition"
-            >
-              <User size={20} /> Profile
-            </button>
-          </nav>
+            <HelpCircle size={22} className="text-white" />
+          </button>
 
           {/* Logout */}
-          <div className="mt-auto">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3
-              bg-[#155E3A] text-white rounded-xl hover:bg-[#0A4A31] transition shadow-lg font-semibold"
-            >
-              <LogOut size={18} /> Log Out
-            </button>
-          </div>
-        </aside>
+          <button
+            onClick={handleLogout}
+            className="p-2 bg-[#1A7548] hover:bg-[#155E3A] transition rounded-full shadow"
+            title="Logout"
+          >
+            <Power size={22} className="text-white" />
+          </button>
 
-        {/* ------------------ MOBILE NAVBAR ------------------ */}
-        <div className="md:hidden w-full bg-white p-4 shadow flex justify-between items-center fixed top-0 left-0 z-50">
-          <Image
-            src="/logo2.png"
-            alt="Revive EcoTech"
-            width={100}
-            height={40}
-            className="object-contain"
-          />
-
+          {/* Circular Profile Icon */}
           <Image
             src={profilePhoto}
             alt="Profile"
-            width={40}
-            height={40}
+            width={45}
+            height={45}
+            className="rounded-full cursor-pointer hover:scale-105 transition"
             onClick={() => router.push("/dashboard/profile")}
-            className="cursor-pointer rounded-xl border border-[#1A7548]"
           />
         </div>
+      </header>
 
-        {/* ------------------ MAIN CONTENT ------------------ */}
-        <main className="flex-1 md:ml-72 p-6 md:p-12 mt-20 md:mt-0">
+      {/* ---------- PAGE TITLE ---------- */}
+      <div className="px-6 mt-10">
+        <h1 className="text-4xl font-extrabold text-[#0A4A31]">Dashboard</h1>
 
-          {/* Top Right (Desktop Only) */}
-          <div className="hidden md:flex justify-end items-center gap-4 mb-8">
-
-            <button
-              onClick={() => router.push("/")}
-              className="px-4 py-2 bg-[#1A7548] text-white rounded-xl font-semibold 
-              flex items-center gap-2 hover:bg-[#155E3A] transition shadow-md"
-            >
-              <Home size={18} /> Home
-            </button>
-
-            <Image
-              src={profilePhoto}
-              alt="Profile"
-              width={48}
-              height={48}
-              onClick={() => router.push("/dashboard/profile")}
-              className="cursor-pointer rounded-xl border-2 border-[#1A7548] shadow-md 
-              hover:scale-105 transition"
-            />
-          </div>
-
-          {/* Heading */}
-          <h1 className="text-4xl font-extrabold text-[#0A4A31] mb-1">
-            Dashboard
-          </h1>
-
-          <p className="text-[#517264] mb-10">
-            Welcome,{" "}
-            <span className="font-semibold text-[#0A4A31]">
-              {user?.displayName || user?.email || user?.phoneNumber}
-            </span>
-          </p>
-
-          {/* Action Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-            {/* Schedule Pickup */}
-            <div
-              onClick={() => router.push("/schedule-pickup")}
-              className="cursor-pointer bg-[#1A7548] p-8 rounded-3xl shadow-lg hover:shadow-2xl 
-              hover:-translate-y-1 transition text-white"
-            >
-              <Package size={32} />
-              <h2 className="text-2xl font-bold mt-4">Schedule Pickup</h2>
-              <p className="text-white/80 mt-2">Book a pickup for recyclables.</p>
-            </div>
-
-            {/* Price List */}
-            <div
-              onClick={() => router.push("/price-list")}
-              className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg 
-              hover:shadow-2xl hover:-translate-y-1 transition"
-            >
-              <Tags size={32} className="text-[#1A7548]" />
-              <h2 className="text-2xl font-bold text-[#0A4A31] mt-4">Price List</h2>
-              <p className="text-[#517264] mt-2">Check current scrap rates.</p>
-            </div>
-
-            {/* History */}
-            <div
-              onClick={() => router.push("/history")}
-              className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg 
-              hover:shadow-2xl hover:-translate-y-1 transition"
-            >
-              <Clock size={32} className="text-[#1A7548]" />
-              <h2 className="text-2xl font-bold text-[#0A4A31] mt-4">History</h2>
-              <p className="text-[#517264] mt-2">Your completed and upcoming pickups.</p>
-            </div>
-
-          </div>
-        </main>
+        <p className="text-[#517264] mt-2">
+          Welcome,&nbsp;
+          <span className="font-semibold text-[#0A4A31]">
+            {userProfile?.username || "User"}
+          </span>
+        </p>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-[#2F5E3A] text-white py-6 w-full rounded-t-3xl mt-10 shadow-inner">
-        <div className="text-center text-sm opacity-90">
-          © {new Date().getFullYear()} Revive Ecotech Ltd
+      {/* ---------- ACTION CARDS ---------- */}
+      <section className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 px-6">
+
+        {/* Schedule Pickup */}
+        <div
+          className="cursor-pointer bg-[#1A7548] text-white p-8 rounded-3xl shadow-lg hover:-translate-y-1 hover:shadow-2xl transition"
+          onClick={() => router.push("/schedule-pickup")}
+        >
+          <Package size={40} />
+          <h2 className="text-3xl font-bold mt-4">Schedule Pickup</h2>
+          <p className="text-white/80 mt-2">Book a pickup for recyclables.</p>
+        </div>
+
+        {/* Price List */}
+        <div
+          className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg hover:-translate-y-1 hover:shadow-2xl transition"
+          onClick={() => router.push("/price-list")}
+        >
+          <Tags size={40} className="text-[#1A7548]" />
+          <h2 className="text-3xl font-bold text-[#0A4A31] mt-4">Price List</h2>
+          <p className="text-[#517264] mt-2">Check current scrap rates.</p>
+        </div>
+
+        {/* History */}
+        <div
+          className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg hover:-translate-y-1 hover:shadow-2xl transition"
+          onClick={() => router.push("/history")}
+        >
+          <Clock size={40} className="text-[#1A7548]" />
+          <h2 className="text-3xl font-bold text-[#0A4A31] mt-4">History</h2>
+          <p className="text-[#517264] mt-2">Your completed & upcoming pickups.</p>
+        </div>
+
+        {/* Help & Support */}
+        <div
+          className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg hover:-translate-y-1 hover:shadow-2xl transition"
+          onClick={() => router.push("/help-support")}
+        >
+          <HelpCircle size={40} className="text-[#1A7548]" />
+          <h2 className="text-3xl font-bold text-[#0A4A31] mt-4">Help & Support</h2>
+          <p className="text-[#517264] mt-2">Get help.</p>
+        </div>
+      </section>
+
+      {/* ---------- COPYRIGHT BOX ---------- */}
+      <footer className="flex flex-col font-sans px-4 sm:px-8 xl:px-10 mx-auto mt-16 mb-8 w-full">
+        <div className="flex flex-col bg-[#386641] rounded-2xl md:rounded-[4rem] pt-8 pb-10 md:pt-12 md:pb-14 px-4 sm:px-8 lg:px-16 shadow-inner">
+          <p className="text-center text-white text-sm tracking-wide">
+            © {new Date().getFullYear()} Revive Ecotech Ltd
+          </p>
         </div>
       </footer>
-    </div>
+
+    </main>
   );
 }

@@ -6,6 +6,17 @@ import { useRouter } from "next/navigation";
 import { Home } from "lucide-react";
 import { saveUserProfile, getUserProfile } from "@/lib/firebase";
 
+// 🔥 Generate random username for new users
+function generateRandomUsername() {
+  const adjectives = ["Green", "Eco", "Recycle", "Fresh", "Clean", "Bright"];
+  const nouns = ["Leaf", "Earth", "River", "Forest", "Wave", "Planet"];
+  const random = Math.floor(Math.random() * 9000) + 1000;
+
+  return `${adjectives[Math.floor(Math.random() * adjectives.length)]}${
+    nouns[Math.floor(Math.random() * nouns.length)]
+  }${random}`;
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -17,34 +28,43 @@ export default function ProfilePage() {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Load Firestore data
+  // 🔥 Load user profile from Firestore
   useEffect(() => {
     if (!user?.uid) return;
 
     (async () => {
       const profile = await getUserProfile(user.uid);
 
-      setUsername(profile?.username || "");
+      // If new user → generate username
+      if (!profile?.username) {
+        const newName = generateRandomUsername();
+        setUsername(newName);
+
+        // Save auto-generated username
+        await saveUserProfile(user.uid, {
+          username: newName,
+          email: user.email || "",
+          phone: user.phoneNumber || "",
+        });
+      } else {
+        setUsername(profile.username);
+      }
+
       setEmail(profile?.email || user.email || "");
       setPhone(profile?.phone || user.phoneNumber || "");
     })();
   }, [user]);
 
-  // Save Profile Data
+  // 🔥 Save changes
   const handleSave = async () => {
     if (!user?.uid) return;
 
     setLoading(true);
 
     try {
-      await saveUserProfile(user.uid, {
-        username,
-        email,
-        phone,
-      });
-
+      await saveUserProfile(user.uid, { username, email, phone });
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      setTimeout(() => setSaved(false), 2500);
     } catch (err) {
       console.error("Profile update failed:", err);
       alert("Failed to update profile.");
@@ -62,11 +82,11 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#F2F7F2] flex justify-center p-6 md:p-10">
       <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-xl border border-[#DDECE2] p-8 md:p-10">
 
-        {/* Dashboard Button */}
+        {/* ---- Dashboard Button ---- */}
         <button
           onClick={() => router.push("/dashboard")}
           className="absolute top-6 right-6 px-5 py-2 bg-[#1A7548] text-white font-semibold 
-            rounded-xl shadow-md hover:bg-[#155E3A] transition flex items-center gap-2"
+          rounded-xl shadow-md hover:bg-[#155E3A] transition flex items-center gap-2"
         >
           <Home size={18} /> Dashboard
         </button>
@@ -74,10 +94,10 @@ export default function ProfilePage() {
         <h1 className="text-4xl font-extrabold text-[#0A4A31]">Profile</h1>
         <p className="text-[#517264] mb-8">Manage your account details</p>
 
-        {/* FORM */}
+        {/* ---- FORM ---- */}
         <div className="space-y-6">
 
-          {/* USERNAME */}
+          {/* Username */}
           <div>
             <label className="block text-sm font-bold text-[#0A4A31] mb-1">
               Username
@@ -92,14 +112,13 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* EMAIL */}
+          {/* Email */}
           <div>
             <label className="block text-sm font-bold text-[#0A4A31] mb-1">
               Email
             </label>
             <input
               type="text"
-              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 bg-gray-50 border rounded-xl 
@@ -107,14 +126,13 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* PHONE */}
+          {/* Phone */}
           <div>
             <label className="block text-sm font-bold text-[#0A4A31] mb-1">
               Phone Number
             </label>
             <input
               type="text"
-              placeholder="Enter phone number"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="w-full px-4 py-3 bg-gray-50 border rounded-xl 
@@ -122,12 +140,12 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* SAVE BUTTON */}
+          {/* Save Button */}
           <button
             onClick={handleSave}
             disabled={loading}
             className="w-full py-3 bg-[#1A7548] text-white rounded-xl font-bold
-            hover:bg-[#155E3A] transition shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+            hover:bg-[#155E3A] transition shadow-md disabled:opacity-60"
           >
             {loading ? "Saving..." : "Save Changes"}
           </button>
@@ -138,7 +156,7 @@ export default function ProfilePage() {
             </p>
           )}
 
-          {/* LOGOUT */}
+          {/* Logout Button */}
           <button
             onClick={handleLogout}
             className="w-full py-3 bg-[#1A7548] text-white rounded-xl font-bold

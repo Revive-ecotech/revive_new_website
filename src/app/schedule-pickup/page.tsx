@@ -14,20 +14,32 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "@/app/context/AuthContext";
+import { getDB } from "@/lib/firebase";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  DocumentData,
+} from "firebase/firestore";
 
-// ---------- Types ----------
-type Category = "Paper" | "Plastic" | "Glass" | "Metals" | "E-waste";
 type Unit = "kg" | "piece";
 
-interface SubItemConfig {
+interface FirestoreItem {
   id: string;
   name: string;
-  rate: number;
+  price: number;
   unit: Unit;
 }
 
+interface FirestoreCategory {
+  id: string;
+  name: string;
+  items: FirestoreItem[];
+}
+
 interface ScrapSelection {
-  category: Category;
+  category: string;
   subItemId: string;
   subItemName: string;
   unit: Unit;
@@ -45,83 +57,101 @@ interface PickupPayload {
   items: ScrapSelection[];
 }
 
-// ---------- Scrap Config ----------
-const SCRAP_CONFIG: Record<Category, SubItemConfig[]> = {
-  Paper: [
-    { id: "news", name: "Newspaper", rate: 14, unit: "kg" },
-    { id: "books", name: "Books / Magazines", rate: 16, unit: "kg" },
-    { id: "cardboard", name: "Cardboard / Gatta", rate: 10, unit: "kg" },
-    { id: "a4", name: "A4 Sheets", rate: 12, unit: "kg" },
-  ],
-  Plastic: [
-    { id: "bottles", name: "Bottles", rate: 10, unit: "kg" },
-    { id: "tupper", name: "Tupperware", rate: 12, unit: "kg" },
-  ],
-  Glass: [{ id: "bottles", name: "Bottles", rate: 10, unit: "kg" }],
-  Metals: [
-    { id: "aluminium", name: "Aluminium", rate: 140, unit: "kg" },
-    { id: "copper", name: "Copper", rate: 570, unit: "kg" },
-    { id: "iron", name: "Iron", rate: 20, unit: "kg" },
-    { id: "steel", name: "Steel", rate: 45, unit: "kg" },
-    { id: "brass", name: "Brass", rate: 400, unit: "kg" },
-  ],
-  "E-waste": [
-    { id: "keypad", name: "Keypad Phone", rate: 200, unit: "piece" },
-    { id: "smartphone", name: "Smart Phone", rate: 400, unit: "piece" },
-    { id: "tablet", name: "Tablet", rate: 300, unit: "piece" },
-    { id: "lcd", name: "LCD", rate: 200, unit: "piece" },
-    { id: "laptop", name: "Laptop", rate: 400, unit: "piece" },
-  ],
-};
-
-const CATEGORIES: Category[] = ["Paper", "Plastic", "Glass", "Metals", "E-waste"];
 const STORAGE_KEY = "pickup-data";
+
+const TIME_SLOTS = [
+  { id: "slot1", label: "9 AM – 12 PM", value: "09:00–12:00" },
+  { id: "slot2", label: "12 PM – 3 PM", value: "12:00–15:00" },
+  { id: "slot3", label: "3 PM – 6 PM", value: "15:00–18:00" },
+  { id: "slot4", label: "6 PM – 9 PM", value: "18:00–21:00" },
+];
 
 export default function SchedulePickupPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const db = getDB();
 
-  const [address, setAddress] = useState("");
+  // -------- UI States --------
+  const [address, setAddress] = useState(""); // Will be auto-filled only
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
 
   const [items, setItems] = useState<ScrapSelection[]>([]);
+  const [categories, setCategories] = useState<FirestoreCategory[]>([]);
 
   const [showModal, setShowModal] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<Category | null>(null);
-  const [selectedSubItemId, setSelectedSubItemId] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState<number>(1);
+  const [activeCategory, setActiveCategory] =
+    useState<FirestoreCategory | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
 
-  // ---------- Prefill ----------
+  // -------------------------------------------------------------
+  // 🔥 Fetch categories + items from Firestore
+  // -------------------------------------------------------------
   useEffect(() => {
-    const shouldPrefill = searchParams.get("edit") === "1";
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return;
+    const load = async () => {
+      const categoriesRef = collection(db, "price_list");
+      const qCat = query(categoriesRef, orderBy("order", "asc"));
+      const catSnap = await getDocs(qCat);
 
-    try {
-      const parsed = JSON.parse(stored) as PickupPayload;
+      const finalData: FirestoreCategory[] = [];
 
-      if (shouldPrefill) {
-        setAddress(parsed.addressDetails.fullAddress);
-        setDate(parsed.pickupDate);
-        setTime(parsed.time);
-        setNotes(parsed.description ?? "");
-        setItems(parsed.items ?? []);
+      for (const cat of catSnap.docs) {
+        const catData = cat.data() as DocumentData;
+
+        const itemsRef = collection(db, "price_list", cat.id, "items");
+        const qItems = query(itemsRef, orderBy("order", "asc"));
+        const itemSnap = await getDocs(qItems);
+
+        const items: FirestoreItem[] = itemSnap.docs.map((d) => {
+          const dData = d.data() as DocumentData;
+          return {
+            id: d.id,
+            name: dData.name,
+            price: dData.price,
+            unit: dData.unit,
+          };
+        });
+
+        finalData.push({
+          id: cat.id,
+          name: catData.name,
+          items,
+        });
       }
-    } catch {}
-  }, []);
 
-  // ---------- Remove Item ----------
+      setCategories(finalData);
+    };
+
+    load();
+  }, [db]);
+
+  // -------------------------------------------------------------
+  // Prefill Address when user selects from ManageAddresses
+  // -------------------------------------------------------------
+  useEffect(() => {
+    const selected = searchParams.get("selectedAddress");
+    if (selected) {
+      setAddress(selected);
+    }
+  }, [searchParams]);
+
+  // -------------------------------------------------------------
+  // REMOVE ITEM
+  // -------------------------------------------------------------
   const removeItem = (index: number) => {
     setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // ---------- Submit ----------
+  // -------------------------------------------------------------
+  // SUBMIT
+  // -------------------------------------------------------------
   const handleSubmit = () => {
     if (!address || !date || !time || items.length === 0) {
-      alert("Fill all details.");
+      alert("Please select address, date, time and items.");
       return;
     }
 
@@ -143,11 +173,13 @@ export default function SchedulePickupPage() {
     router.push("/schedule-pickup/summary");
   };
 
-  // ---------- Modal Logic ----------
-  const openCategoryModal = (category: Category) => {
-    setActiveCategory(category);
-    const first = SCRAP_CONFIG[category][0];
-    setSelectedSubItemId(first?.id ?? null);
+  // -------------------------------------------------------------
+  // MODAL
+  // -------------------------------------------------------------
+  const openCategoryModal = (cat: FirestoreCategory) => {
+    if (!cat.items.length) return;
+    setActiveCategory(cat);
+    setSelectedItemId(cat.items[0]?.id || null);
     setQuantity(1);
     setShowModal(true);
   };
@@ -155,23 +187,27 @@ export default function SchedulePickupPage() {
   const closeModal = () => {
     setShowModal(false);
     setActiveCategory(null);
-    setSelectedSubItemId(null);
+    setSelectedItemId(null);
     setQuantity(1);
   };
 
-  const currentSubItems = activeCategory ? SCRAP_CONFIG[activeCategory] : [];
-  const selectedSubItem = currentSubItems.find((s) => s.id === selectedSubItemId);
-  const estimatedAmount = selectedSubItem ? selectedSubItem.rate * quantity : 0;
+  const selectedItem =
+    activeCategory?.items.find((i) => i.id === selectedItemId) || null;
+
+  const estimatedAmount = selectedItem ? selectedItem.price * quantity : 0;
 
   return (
     <main className="min-h-screen bg-[#F2F7F2] pb-24">
       {/* HEADER */}
       <header className="w-full py-6 px-10 flex items-center justify-between border-b bg-white shadow-sm sticky top-0 z-30">
-        <div
-          className="cursor-pointer relative w-44 h-12"
-          onClick={() => router.push("/dashboard")}
-        >
-          <Image src="/logo2.png" fill alt="Revive Logo" className="object-contain" />
+        <div className="cursor-pointer relative w-44 h-12">
+          <Image
+            src="/logo2.png"
+            fill
+            alt="Revive Logo"
+            className="object-contain"
+            onClick={() => router.push("/dashboard")}
+          />
         </div>
 
         <button
@@ -184,59 +220,109 @@ export default function SchedulePickupPage() {
 
       {/* TITLE */}
       <div className="text-center mt-12">
-        <h1 className="text-5xl font-extrabold text-[#0A4A31]">Schedule Pickup</h1>
-        <p className="text-[#517264] text-lg mt-2">Fill the details to book pickup</p>
+        <h1 className="text-5xl font-extrabold text-[#0A4A31]">
+          Schedule Pickup
+        </h1>
+        <p className="text-[#517264] text-lg mt-2">
+          Book a pickup in just a few taps
+        </p>
       </div>
 
-      {/* MAIN FORM */}
+      {/* FORM BOX */}
       <div className="max-w-2xl bg-white rounded-3xl shadow-xl mx-auto mt-12 p-10 border space-y-10">
 
         {/* ADDRESS */}
         <section>
-          <h2 className="flex items-center gap-3 text-2xl font-bold text-[#0A4A31] mb-4">
-            <MapPin size={26} className="text-[#1A7548]" />
-            Pickup Location
+          <h2 className="flex items-center gap-3 text-2xl font-bold text-[#0A4A31] mb-3">
+            <MapPin className="text-[#1A7548]" /> Pickup Address
           </h2>
 
-          <input
-            type="text"
-            placeholder="Enter complete pickup address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            className="w-full px-5 py-4 bg-gray-50 border rounded-xl outline-none 
-            focus:ring-2 focus:ring-[#1A7548]"
-          />
+          {!address && (
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() =>
+                  router.push("/add-address?returnTo=/schedule-pickup")
+                }
+                className="px-4 py-3 rounded-xl border border-[#1A7548] text-sm font-semibold text-[#1A7548] bg-white hover:bg-[#EAF3ED]"
+              >
+                + Create New Address
+              </button>
+
+              <button
+                onClick={() =>
+                  router.push("/manage-addresses?mode=pick&returnTo=/schedule-pickup")
+                }
+                className="px-4 py-3 rounded-xl border text-sm font-semibold bg-gray-100 hover:bg-gray-200"
+              >
+                Choose From Saved Addresses
+              </button>
+            </div>
+          )}
+
+          {/* SHOW SELECTED ADDRESS */}
+          {address && (
+            <div className="mt-4 p-4 border rounded-xl bg-[#EAF3ED]">
+              <p className="font-semibold text-[#0A4A31]">{address}</p>
+
+              <button
+                className="mt-2 text-xs text-red-600 underline"
+                onClick={() => setAddress("")}
+              >
+                Change Address
+              </button>
+            </div>
+          )}
         </section>
 
         {/* DATE & TIME */}
         <section>
           <h2 className="flex items-center gap-3 text-2xl font-bold text-[#0A4A31] mb-4">
-            <Calendar size={26} className="text-[#1A7548]" />
-            Pickup Date & Time
+            <Calendar className="text-[#1A7548]" /> Pickup Date & Time
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            <div className="flex items-center gap-3 bg-gray-50 border rounded-xl px-4 py-3">
-              <Calendar size={20} className="text-gray-500" />
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="bg-transparent w-full outline-none"
-              />
+          <div className="space-y-4">
+            {/* Date */}
+            <div>
+              <label className="block text-sm text-[#517264] mb-1">
+                Select pickup date
+              </label>
+              <div className="flex items-center gap-3 bg-gray-50 border rounded-xl px-4 py-3">
+                <Calendar size={20} className="text-gray-500" />
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="bg-transparent w-full outline-none"
+                />
+              </div>
             </div>
 
-            <div className="flex items-center gap-3 bg-gray-50 border rounded-xl px-4 py-3">
-              <Clock size={20} className="text-gray-500" />
-              <input
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="bg-transparent w-full outline-none"
-              />
+            {/* Time Slots */}
+            <div>
+              <label className="block text-sm text-[#517264] mb-2">
+                Choose a time slot
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {TIME_SLOTS.map((slot) => (
+                  <button
+                    key={slot.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedSlotId(slot.id);
+                      setTime(slot.value);
+                    }}
+                    className={`px-4 py-3 rounded-xl border text-sm font-semibold ${
+                      selectedSlotId === slot.id
+                        ? "bg-[#1A7548] text-white border-[#1A7548]"
+                        : "bg-gray-50 text-[#0A4A31] hover:bg-gray-100"
+                    }`}
+                  >
+                    <Clock size={16} className="inline mr-2" />
+                    {slot.label}
+                  </button>
+                ))}
+              </div>
             </div>
-
           </div>
         </section>
 
@@ -247,13 +333,13 @@ export default function SchedulePickupPage() {
           </h2>
 
           <div className="grid grid-cols-3 gap-3 mb-4">
-            {CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <button
-                key={cat}
+                key={cat.id}
                 onClick={() => openCategoryModal(cat)}
                 className="px-4 py-2 rounded-xl border text-sm font-semibold bg-gray-100 hover:bg-gray-200"
               >
-                {cat}
+                {cat.name}
               </button>
             ))}
           </div>
@@ -263,7 +349,7 @@ export default function SchedulePickupPage() {
               <table className="w-full text-left text-sm">
                 <thead className="bg-[#F5F8F5]">
                   <tr>
-                    <th className="py-2 px-4 w-12"></th>
+                    <th />
                     <th className="py-2 px-4">Category</th>
                     <th className="py-2 px-4">Item</th>
                     <th className="py-2 px-4">Qty</th>
@@ -275,18 +361,15 @@ export default function SchedulePickupPage() {
                 <tbody>
                   {items.map((item, idx) => (
                     <tr key={idx} className="border-t">
-
-                      {/* Green Trash Button */}
                       <td className="py-2 px-4">
                         <button
                           type="button"
                           onClick={() => removeItem(idx)}
-                          className="p-2 rounded-lg hover:bg-[#E8F6EE] transition"
+                          className="p-2 rounded-lg hover:bg-[#E8F6EE]"
                         >
                           <Trash2 size={18} className="text-[#1A7548]" />
                         </button>
                       </td>
-
                       <td className="py-2 px-4">{item.category}</td>
                       <td className="py-2 px-4">{item.subItemName}</td>
                       <td className="py-2 px-4">
@@ -309,7 +392,7 @@ export default function SchedulePickupPage() {
           </h2>
 
           <textarea
-            placeholder="Optional message..."
+            placeholder="Landmark or extra instructions (optional)"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             className="w-full bg-gray-50 border rounded-xl p-4 outline-none focus:ring-2 focus:ring-[#1A7548]"
@@ -327,43 +410,42 @@ export default function SchedulePickupPage() {
       </div>
 
       {/* MODAL */}
-      {showModal && activeCategory && selectedSubItem && (
+      {showModal && activeCategory && selectedItem && (
         <div className="fixed inset-0 bg-black/40 flex items-end justify-center z-50">
           <div className="w-full max-w-md bg-white rounded-t-3xl p-6">
             <h3 className="text-xl font-bold text-[#0A4A31] mb-4">
-              Add item for {activeCategory}
+              Add item for {activeCategory.name}
             </h3>
 
-            {/* Subitems */}
             <div className="border rounded-xl mb-4 overflow-hidden">
-              {currentSubItems.map((sub) => (
+              {activeCategory.items.map((sub) => (
                 <button
                   key={sub.id}
-                  onClick={() => setSelectedSubItemId(sub.id)}
+                  onClick={() => setSelectedItemId(sub.id)}
                   className={`w-full text-left px-4 py-3 text-sm ${
-                    selectedSubItemId === sub.id
+                    selectedItemId === sub.id
                       ? "bg-[#EAF3ED] font-semibold"
                       : "bg-white hover:bg-gray-50"
                   }`}
                 >
-                  {sub.name} (₹{sub.rate}/{sub.unit})
+                  {sub.name} (₹{sub.price}/{sub.unit})
                 </button>
               ))}
             </div>
 
-            {/* Quantity Selector */}
+            {/* Qty */}
             <div className="mb-4">
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-semibold">Estimated Amount</span>
                 <span className="font-semibold">
-                  {quantity} {selectedSubItem.unit} → ₹{estimatedAmount}
+                  ≈ ₹{estimatedAmount} ({quantity} {selectedItem.unit})
                 </span>
               </div>
 
               <input
                 type="range"
                 min={1}
-                max={selectedSubItem.unit === "piece" ? 20 : 100}
+                max={selectedItem.unit === "piece" ? 20 : 100}
                 value={quantity}
                 onChange={(e) => setQuantity(Number(e.target.value))}
                 className="w-full"
@@ -374,7 +456,7 @@ export default function SchedulePickupPage() {
                 min={1}
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-                className="mt-2 w-24 border rounded-lg px-2 py-1 text-sm"
+                className="mt-2 w-24 border rounded-lg px-2 py-1 text-sm bg-gray-50"
               />
             </div>
 
@@ -392,11 +474,11 @@ export default function SchedulePickupPage() {
                   setItems((prev) => [
                     ...prev,
                     {
-                      category: activeCategory,
-                      subItemId: selectedSubItem.id,
-                      subItemName: selectedSubItem.name,
-                      unit: selectedSubItem.unit,
-                      rate: selectedSubItem.rate,
+                      category: activeCategory.name,
+                      subItemId: selectedItem.id,
+                      subItemName: selectedItem.name,
+                      unit: selectedItem.unit,
+                      rate: selectedItem.price,
                       quantity,
                       estimatedAmount,
                     },
