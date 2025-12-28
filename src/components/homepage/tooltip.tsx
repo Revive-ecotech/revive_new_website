@@ -6,27 +6,31 @@ import { AnimatedTooltip } from "../ui/animated-tooltip";
 const people = [
   {
     id: 1,
-    name: "Aarav Sharma",
-    designation: "Operations Manager",
-    image: "https://i.pravatar.cc/150?img=12",
+    name: "Rahul Kumar",
+    designation: "Recycling Partner",
+    image:
+      "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?auto=format&fit=crop&w=400&q=80",
   },
   {
     id: 2,
-    name: "Riya Patel",
-    designation: "Sustainability Lead",
-    image: "https://i.pravatar.cc/150?img=47",
+    name: "Pooja Sharma",
+    designation: "Community Member",
+    image:
+      "https://images.unsplash.com/photo-1599847021117-c4c3f1cbe8f3?auto=format&fit=crop&w=400&q=80",
   },
   {
     id: 3,
-    name: "Kunal Verma",
-    designation: "Logistics Coordinator",
-    image: "https://i.pravatar.cc/150?img=68",
+    name: "Amit Verma",
+    designation: "Logistics Associate",
+    image:
+      "https://images.unsplash.com/photo-1618641986557-1ecd230959aa?auto=format&fit=crop&w=400&q=80",
   },
   {
     id: 4,
-    name: "Ananya Iyer",
-    designation: "Community Partner",
-    image: "https://i.pravatar.cc/150?img=32",
+    name: "Neha Singh",
+    designation: "Sustainability Advocate",
+    image:
+      "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=400&q=80",
   },
 ];
 
