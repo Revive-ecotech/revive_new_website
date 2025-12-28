@@ -20,17 +20,17 @@ const people = [
   },
   {
     id: 3,
-    name: "Amit Singh",
-    designation: "Logistics Associate",
-    image:
-      "https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?auto=format&fit=crop&w=400&q=80", // unchanged
-  },
-  {
-    id: 4,
     name: "Pallavi Joshi",
     designation: "Sustainability Advocate",
     image:
       "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=400&q=80", // Indian woman
+  },
+  {
+    id: 4,
+    name: "Amit Singh",
+    designation: "Logistics Associate",
+    image:
+      "https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?auto=format&fit=crop&w=400&q=80", // unchanged
   },
 ];
 
