@@ -59,12 +59,12 @@ const AboutRevive = () => {
                     
                     <div className='lg:w-1/2 flex justify-center'>
                         <div className='relative'>
-                            <div className='w-80 h-80 md:w-96 md:h-96 bg-white bg-opacity-10 rounded-full flex items-center justify-center backdrop-blur-sm'>
+                            <div className='w-64 h-64 md:w-80 md:h-80 bg-white bg-opacity-10 rounded-full flex items-center justify-center backdrop-blur-sm'>
                                 <Image 
                                     src="/logo.png" 
                                     alt="Revive Ecotech Logo" 
-                                    width={200} 
-                                    height={200}
+                                    width={160} 
+                                    height={160}
                                     className="rounded-full"
                                 />
                             </div>
