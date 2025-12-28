@@ -169,27 +169,27 @@ export default function DashboardPage() {
 
 
       {/* ---------- COPYRIGHT BOX ---------- */}
-      {/* ---------- FOOTER ---------- */}
+
 {/* ---------- FOOTER ---------- */}
-<footer className="w-full mt-12">
+<footer className="w-full mt-10">
   <div
     className="
       w-full
       bg-[#386641]
-      rounded-l-[3rem]
+      rounded-l-[2.5rem]
       px-8
-      py-6
-      shadow-sm
+      py-4
       flex
       items-center
       justify-center
     "
   >
-    <p className="text-white text-sm tracking-wide">
+    <p className="text-white text-xs tracking-wide">
       © {new Date().getFullYear()} Revive Ecotech Ltd
     </p>
   </div>
 </footer>
+
 
 
 
