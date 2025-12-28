@@ -204,6 +204,25 @@ export default function HistoryPage() {
             ))}
           </div>
         )}
+        {/* ---------- FOOTER ---------- */}
+<footer className="w-full flex justify-center pb-10">
+  <div
+    className="
+      bg-[#386641]
+      rounded-2xl
+      px-40
+      py-6
+      flex
+      items-center
+      justify-center
+    "
+  >
+    <p className="text-white text-sm tracking-wide whitespace-nowrap">
+      © {new Date().getFullYear()} Revive Ecotech Ltd
+    </p>
+  </div>
+</footer>
+
       </div>
     </main>
   );
