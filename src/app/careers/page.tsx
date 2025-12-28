@@ -24,7 +24,7 @@ const jobs = [
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold text-[#253612] mb-3">🌐 Web Development Track (Next.js + Cloud + Dashboard Systems)</h3>
+          <h3 className="text-lg font-semibold text-[#253612] mb-3">Web Development Track (Next.js + Cloud + Dashboard Systems)</h3>
           <h4 className="font-semibold text-[#253612] mb-2">You will:</h4>
           <ul className="list-none text-gray-600 space-y-2 mb-4">
             <li>– Build our web platform using Next.js, React & Tailwind CSS</li>
@@ -43,7 +43,7 @@ const jobs = [
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold text-[#253612] mb-3">📱 App Development Track (Flutter + Android + UI/UX)</h3>
+          <h3 className="text-lg font-semibold text-[#253612] mb-3">App Development Track (Flutter + Android + UI/UX)</h3>
           <h4 className="font-semibold text-[#253612] mb-2">You will:</h4>
           <ul className="list-none text-gray-600 space-y-2 mb-4">
             <li>– Build the Revive mobile app for users, industries & scrap collectors</li>
@@ -62,11 +62,11 @@ const jobs = [
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏰ Duration</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏱ Duration</h3>
             <p className="text-gray-600">3-6 months</p>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">📍 Location</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⌂ Location</h3>
             <p className="text-gray-600">Remote / Hybrid</p>
           </div>
         </div>
@@ -116,11 +116,11 @@ const jobs = [
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏰ Duration</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏱ Duration</h3>
             <p className="text-gray-600">3-6 months</p>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">📍 Location</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⌂ Location</h3>
             <p className="text-gray-600">Hybrid (Lab + Field)</p>
           </div>
         </div>
@@ -167,11 +167,11 @@ const jobs = [
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏰ Duration</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏱ Duration</h3>
             <p className="text-gray-600">3-6 months</p>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">📍 Location</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⌂ Location</h3>
             <p className="text-gray-600">Field-based / Hybrid</p>
           </div>
         </div>
@@ -218,11 +218,11 @@ const jobs = [
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏰ Duration</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏱ Duration</h3>
             <p className="text-gray-600">3-6 months</p>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">📍 Location</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⌂ Location</h3>
             <p className="text-gray-600">Field-based / Hybrid</p>
           </div>
         </div>
@@ -271,11 +271,11 @@ const jobs = [
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏰ Duration</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏱ Duration</h3>
             <p className="text-gray-600">3-6 months</p>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">📍 Location</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⌂ Location</h3>
             <p className="text-gray-600">Field-based / Hybrid</p>
           </div>
         </div>
@@ -298,7 +298,7 @@ const jobs = [
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold text-[#253612] mb-3">🧾 Section 1: Financial Management & Compliance</h3>
+          <h3 className="text-lg font-semibold text-[#253612] mb-3">Section 1: Financial Management & Compliance</h3>
           <p className="text-gray-600 mb-3">You&apos;ll ensure that every rupee, transaction, and operation aligns with transparency and compliance standards.</p>
           <ul className="list-none text-gray-600 space-y-2">
             <li>– Maintain daily transaction records — including payments to collectors, industry revenues, logistics costs, and event expenses</li>
@@ -312,7 +312,7 @@ const jobs = [
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold text-[#253612] mb-3">📊 Section 2: Strategic Analysis & Business Growth</h3>
+          <h3 className="text-lg font-semibold text-[#253612] mb-3">Section 2: Strategic Analysis & Business Growth</h3>
           <p className="text-gray-600 mb-3">This section focuses on shaping Revive Ecotech&apos;s financial future — using data, strategy, and innovation.</p>
           <ul className="list-none text-gray-600 space-y-2">
             <li>– Study market competition, pricing structures, and business models to identify growth opportunities</li>
@@ -332,11 +332,11 @@ const jobs = [
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏰ Duration</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⏱ Duration</h3>
             <p className="text-gray-600">3-6 months</p>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-[#253612] mb-2">📍 Location</h3>
+            <h3 className="text-lg font-semibold text-[#253612] mb-2">⌂ Location</h3>
             <p className="text-gray-600">Remote / Hybrid</p>
           </div>
         </div>
