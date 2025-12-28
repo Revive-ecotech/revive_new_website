@@ -30,7 +30,7 @@ const people = [
     name: "Pallavi Joshi",
     designation: "Sustainability Advocate",
     image:
-      "https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1599847021117-c4c3f1cbe8f3?auto=format&fit=crop&w=400&q=80",
   },
 ];
 
