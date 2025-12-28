@@ -171,13 +171,13 @@ export default function DashboardPage() {
       {/* ---------- COPYRIGHT BOX ---------- */}
 
 {/* ---------- FOOTER ---------- */}
-<footer className="w-full flex justify-center pb-8">
+<footer className="w-full flex justify-center pb-10">
   <div
     className="
       bg-[#386641]
       rounded-2xl
-      px-32
-      py-5
+      px-40
+      py-6
       flex
       items-center
       justify-center
