@@ -95,7 +95,8 @@ export default function DashboardPage() {
 
       {/* ---------- PAGE TITLE ---------- */}
       <div className="px-6 mt-10">
-        <h1 className="text-4xl font-extrabold text-[#0A4A31]">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-[#0A4A31]">Dashboard</h1>
+
 
         <p className="text-[#517264] mt-2">
           Welcome,&nbsp;
@@ -106,48 +107,66 @@ export default function DashboardPage() {
       </div>
 
       {/* ---------- ACTION CARDS ---------- */}
-      <section className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 px-6">
+<section className="mt-8 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 px-6">
 
-        {/* Schedule Pickup */}
-        <div
-          className="cursor-pointer bg-[#1A7548] text-white p-8 rounded-3xl shadow-lg hover:-translate-y-1 hover:shadow-2xl transition"
-          onClick={() => router.push("/schedule-pickup")}
-        >
-          <Package size={40} />
-          <h2 className="text-3xl font-bold mt-4">Schedule Pickup</h2>
-          <p className="text-white/80 mt-2">Book a pickup for recyclables.</p>
-        </div>
+  {/* Schedule Pickup */}
+  <div
+    className="cursor-pointer bg-[#1A7548] text-white p-5 lg:p-6 rounded-2xl shadow hover:-translate-y-0.5 hover:shadow-xl transition"
+    onClick={() => router.push("/schedule-pickup")}
+  >
+    <Package size={28} />
+    <h2 className="text-xl lg:text-2xl font-semibold mt-3">
+      Schedule Pickup
+    </h2>
+    <p className="text-white/80 text-sm mt-1">
+      Book a pickup for recyclables.
+    </p>
+  </div>
 
-        {/* Price List */}
-        <div
-          className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg hover:-translate-y-1 hover:shadow-2xl transition"
-          onClick={() => router.push("/price-list")}
-        >
-          <Tags size={40} className="text-[#1A7548]" />
-          <h2 className="text-3xl font-bold text-[#0A4A31] mt-4">Price List</h2>
-          <p className="text-[#517264] mt-2">Check current scrap rates.</p>
-        </div>
+  {/* Price List */}
+  <div
+    className="cursor-pointer bg-white border border-[#DDECE2] p-5 lg:p-6 rounded-2xl shadow hover:-translate-y-0.5 hover:shadow-xl transition"
+    onClick={() => router.push("/price-list")}
+  >
+    <Tags size={28} className="text-[#1A7548]" />
+    <h2 className="text-xl lg:text-2xl font-semibold text-[#0A4A31] mt-3">
+      Price List
+    </h2>
+    <p className="text-[#517264] text-sm mt-1">
+      Check current scrap rates.
+    </p>
+  </div>
 
-        {/* History */}
-        <div
-          className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg hover:-translate-y-1 hover:shadow-2xl transition"
-          onClick={() => router.push("/history")}
-        >
-          <Clock size={40} className="text-[#1A7548]" />
-          <h2 className="text-3xl font-bold text-[#0A4A31] mt-4">History</h2>
-          <p className="text-[#517264] mt-2">Your completed & upcoming pickups.</p>
-        </div>
+  {/* History */}
+  <div
+    className="cursor-pointer bg-white border border-[#DDECE2] p-5 lg:p-6 rounded-2xl shadow hover:-translate-y-0.5 hover:shadow-xl transition"
+    onClick={() => router.push("/history")}
+  >
+    <Clock size={28} className="text-[#1A7548]" />
+    <h2 className="text-xl lg:text-2xl font-semibold text-[#0A4A31] mt-3">
+      History
+    </h2>
+    <p className="text-[#517264] text-sm mt-1">
+      Your completed & upcoming pickups.
+    </p>
+  </div>
 
-        {/* Help & Support */}
-        <div
-          className="cursor-pointer bg-white border border-[#DDECE2] p-8 rounded-3xl shadow-lg hover:-translate-y-1 hover:shadow-2xl transition"
-          onClick={() => router.push("/help-support")}
-        >
-          <HelpCircle size={40} className="text-[#1A7548]" />
-          <h2 className="text-3xl font-bold text-[#0A4A31] mt-4">Help & Support</h2>
-          <p className="text-[#517264] mt-2">Get help.</p>
-        </div>
-      </section>
+  {/* Help & Support */}
+  <div
+    className="cursor-pointer bg-white border border-[#DDECE2] p-5 lg:p-6 rounded-2xl shadow hover:-translate-y-0.5 hover:shadow-xl transition"
+    onClick={() => router.push("/help-support")}
+  >
+    <HelpCircle size={28} className="text-[#1A7548]" />
+    <h2 className="text-xl lg:text-2xl font-semibold text-[#0A4A31] mt-3">
+      Help & Support
+    </h2>
+    <p className="text-[#517264] text-sm mt-1">
+      Get help.
+    </p>
+  </div>
+
+</section>
+
 
       {/* ---------- COPYRIGHT BOX ---------- */}
       <footer className="flex flex-col font-sans px-4 sm:px-8 xl:px-10 mx-auto mt-16 mb-8 w-full">
