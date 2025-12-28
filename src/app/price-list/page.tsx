@@ -161,3 +161,27 @@ export default function PriceListPage() {
     </main>
   );
 }
+{/* ---------- FOOTER ---------- */}
+<footer className="w-full flex justify-center pb-10 mt-12">
+  <div
+    className="
+      bg-[#386641]
+      rounded-2xl
+      flex
+      items-center
+      justify-center
+      px-6
+      py-4
+      sm:px-12
+      sm:py-5
+      md:px-24
+      md:py-6
+      lg:px-40
+    "
+  >
+    <p className="text-white text-xs sm:text-sm tracking-wide whitespace-nowrap">
+      © {new Date().getFullYear()} Revive Ecotech Ltd
+    </p>
+  </div>
+</footer>
+
