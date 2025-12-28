@@ -1,43 +1,45 @@
 "use client";
 
-import React from "react";
-import { AnimatedTooltip } from "../ui/animated-tooltip";
+import Image from "next/image";
+import { motion } from "framer-motion";
 
-const people = [
-  {
-    id: 1,
-    name: "Ramesh Kumar",
-    designation: "Recycling Partner",
-    image:
-      "https://images.unsplash.com/photo-1624206112918-f140f087f9b5?auto=format&fit=crop&w=400&q=80",
-  },
-  {
-    id: 2,
-    name: "Sunita Devi",
-    designation: "Community Member",
-    image:
-      "https://images.unsplash.com/photo-1611590027211-b954fd027b51?auto=format&fit=crop&w=400&q=80",
-  },
-  {
-    id: 3,
-    name: "Amit Singh",
-    designation: "Logistics Associate",
-    image:
-      "https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?auto=format&fit=crop&w=400&q=80",
-  },
-  {
-    id: 4,
-    name: "Pallavi Joshi",
-    designation: "Sustainability Advocate",
-    image:
-      "https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&w=400&q=80",
-  },
-];
+interface Item {
+  id: number;
+  name: string;
+  designation: string;
+  image: string;
+}
 
-export function AnimatedTooltipPreview() {
+export function AnimatedTooltip({ items }: { items: Item[] }) {
   return (
-    <div className="flex flex-row items-center justify-center">
-      <AnimatedTooltip items={people} />
+    <div className="flex justify-center items-center">
+      <div className="flex items-center">
+        {items.map((item, idx) => (
+          <motion.div
+            key={item.id}
+            className="relative"
+            style={{
+              marginLeft: idx === 0 ? 0 : -18, // balanced overlap
+              zIndex: items.length - idx,     // left faces stay visible
+            }}
+            whileHover={{
+              scale: 1.15,
+              zIndex: 50,
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-white shadow-md bg-white">
+              <Image
+                src={item.image}
+                alt={item.name}
+                fill
+                className="object-cover rounded-full"
+                sizes="56px"
+              />
+            </div>
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 }
