@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -110,21 +110,28 @@ export default function PriceListPage() {
             return (
               <div
                 key={group.category}
-                className="bg-white shadow rounded-2xl border border-[#DDECE2]"
+                className="bg-white border border-[#DDECE2] rounded-2xl shadow-sm"
               >
+                {/* ACCORDION HEADER */}
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : index)}
-                  className="w-full flex justify-between items-center px-6 py-4 text-lg font-semibold text-[#0A4A31]"
+                  className="w-full flex items-center justify-between px-6 py-4 text-lg font-semibold text-[#0A4A31]"
                 >
                   {group.category}
 
-                  {isOpen ? (
-                    <ChevronDown size={24} className="text-green-600" />
-                  ) : (
-                    <ChevronUp size={24} className="text-green-600" />
-                  )}
+                  {/* MODERN ROTATING CHEVRON */}
+                  <ChevronDown
+                    size={22}
+                    className={`
+                      text-[#1A7548]
+                      transition-transform
+                      duration-300
+                      ${isOpen ? "rotate-180" : "rotate-0"}
+                    `}
+                  />
                 </button>
 
+                {/* ACCORDION CONTENT */}
                 {isOpen && (
                   <div className="px-6 pb-4">
                     {group.items.length === 0 && (
