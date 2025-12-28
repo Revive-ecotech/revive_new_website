@@ -9,28 +9,28 @@ const people = [
     name: "Ramesh Kumar",
     designation: "Recycling Partner",
     image:
-      "https://images.unsplash.com/photo-1624206112918-f140f087f9b5?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&w=400&q=80", // Indian man
   },
   {
     id: 2,
     name: "Sunita Devi",
     designation: "Community Member",
     image:
-      "https://images.unsplash.com/photo-1611590027211-b954fd027b51?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1611590027211-b954fd027b51?auto=format&fit=crop&w=400&q=80", // unchanged
   },
   {
     id: 3,
     name: "Amit Singh",
     designation: "Logistics Associate",
     image:
-      "https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?auto=format&fit=crop&w=400&q=80", // unchanged
   },
   {
     id: 4,
     name: "Pallavi Joshi",
     designation: "Sustainability Advocate",
     image:
-      "https://images.unsplash.com/photo-1599847021117-c4c3f1cbe8f3?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=400&q=80", // Indian woman
   },
 ];
 
