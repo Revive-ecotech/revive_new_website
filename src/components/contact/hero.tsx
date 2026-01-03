@@ -83,7 +83,7 @@ const ContactHero = () => {
                                                 ? 'border-[#386641] shadow-lg shadow-[#386641]/10 scale-[1.02]'
                                                 : 'border-gray-200 hover:border-gray-300'
                                                 }`}
-                                            placeholder="John Doe"
+                                            placeholder="Your Name"
                                         />
                                     </div>
 
@@ -104,7 +104,7 @@ const ContactHero = () => {
                                                 ? 'border-[#386641] shadow-lg shadow-[#386641]/10 scale-[1.02]'
                                                 : 'border-gray-200 hover:border-gray-300'
                                                 }`}
-                                            placeholder="john@example.com"
+                                            placeholder="name@example.com"
                                         />
                                     </div>
                                 </div>
