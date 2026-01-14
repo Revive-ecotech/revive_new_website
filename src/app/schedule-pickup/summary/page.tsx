@@ -87,14 +87,14 @@ export default function PickupSummaryPage() {
         <div className="flex gap-3">
           <button
             onClick={() => router.push("/")}
-            className="hidden md:flex items-center gap-2 text-[#0A4A31] font-semibold hover:underline"
+            className="hidden md:flex items-center gap-2 text-[#0A4A31] font-semibold hover:underline cursor-pointer"
           >
             <Home size={18} /> Home
           </button>
 
           <button
             onClick={() => router.push("/schedule-pickup?edit=1")}
-            className="text-[#0A4A31] font-semibold flex items-center gap-2 hover:underline"
+            className="text-[#0A4A31] font-semibold flex items-center gap-2 hover:underline cursor-pointer"
           >
             <ArrowLeft size={18} /> Edit Pickup
           </button>

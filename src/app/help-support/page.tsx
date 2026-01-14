@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Mail, Phone, ArrowLeft } from "lucide-react";
+import Link from "next/link"; // ✅ REQUIRED
 
 export default function HelpSupportPage() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function HelpSupportPage() {
         {/* Back Button */}
         <button
           onClick={() => router.push("/dashboard")}
-          className="flex items-center gap-2 bg-[#1A7548] text-white px-5 py-2 rounded-full shadow hover:bg-[#155E3A] transition font-semibold"
+          className="flex items-center gap-2 bg-[#1A7548] text-white px-5 py-2 rounded-full shadow hover:bg-[#155E3A] transition font-semibol cursor-pointer"
         >
           <ArrowLeft size={18} /> Back
         </button>
@@ -85,14 +86,57 @@ export default function HelpSupportPage() {
         </div>
       </section>
 
-      {/* -------- FOOTER -------- */}
-      <footer className="w-full flex justify-center mt-auto pt-16 px-4">
-        <div className="w-full max-w-6xl bg-[#2F5E3A] rounded-full py-5 shadow-lg flex justify-center">
-          <p className="text-white text-sm font-medium tracking-wide">
-            © {new Date().getFullYear()} Revive Ecotech Ltd
-          </p>
+      {/* SOFT SPACING / FADE */}
+<div className="h-24 bg-gradient-to-b from-transparent to-[#E8F1EA]" />
+
+{/* ---------- FOOTER ---------- */}
+<footer className="w-full px-4 sm:px-6 pb-8">
+  <div className="max-w-7xl mx-auto">
+    <div className="bg-[#2F5E3A] rounded-3xl px-6 py-6 shadow-lg">
+
+      {/* TOP ROW */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+
+        {/* LEFT: LOGO */}
+        <div className="flex items-center gap-3">
+          <Image
+            src="/logo2.png"
+            alt="Revive"
+            width={110}
+            height={40}
+            className="object-contain"
+          />
         </div>
-      </footer>
+
+        {/* RIGHT: LINKS */}
+        <div className="flex gap-6 text-sm text-white">
+          <Link
+            href="/terms"
+            className="hover:underline underline-offset-4 transition cursor-pointer"
+          >
+            Terms
+          </Link>
+          <Link
+            href="/privacy"
+            className="hover:underline underline-offset-4 transition cursor-pointer"
+          >
+            Privacy
+          </Link>
+        </div>
+      </div>
+
+      {/* DIVIDER */}
+      <div className="h-px bg-white/20 my-4" />
+
+      {/* BOTTOM */}
+      <div className="flex justify-center text-xs text-white/70">
+        <p>© {new Date().getFullYear()} Revive Ecotech Ltd</p>
+      </div>
+
+    </div>
+  </div>
+</footer>
+
     </main>
   );
 }

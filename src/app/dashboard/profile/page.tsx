@@ -83,7 +83,7 @@ export default function ProfilePage() {
         <div className="absolute top-6 right-6 flex gap-2">
           <button
             onClick={() => router.push("/dashboard")}
-            className="p-3 rounded-xl bg-[#1A7548] text-white hover:bg-[#155E3A] transition shadow"
+            className="p-3 rounded-xl bg-[#1A7548] text-white hover:bg-[#155E3A] transition shadow cursor-pointer"
             aria-label="Dashboard"
           >
             <Home size={20} />
@@ -141,7 +141,7 @@ export default function ProfilePage() {
           <button
             onClick={handleSave}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1A7548] text-white font-bold shadow hover:bg-[#155E3A] transition disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1A7548] text-white font-bold shadow hover:bg-[#155E3A] transition disabled:opacity-60 cursor-pointer"
           >
             <Save size={18} />
             {loading ? "Saving..." : "Save Changes"}
@@ -162,7 +162,7 @@ export default function ProfilePage() {
   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl 
              bg-white text-[#1A7548] font-bold border-2 border-[#1A7548]
              hover:bg-[#F2F7F2] hover:text-[#0A4A31]
-             transition shadow-sm"
+             transition shadow-sm cursor-pointer"
 >
   <LogOut size={18} />
   Logout

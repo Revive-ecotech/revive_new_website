@@ -22,7 +22,7 @@ export default function PickupSuccessPage() {
 
         <button
           onClick={() => router.push("/dashboard")}
-          className="text-[#0A4A31] font-semibold hover:underline"
+          className="text-[#0A4A31] font-semibold hover:underline cursor-pointer"
         >
           Dashboard
         </button>
@@ -57,7 +57,7 @@ export default function PickupSuccessPage() {
           <button
             onClick={() => router.push("/dashboard")}
             className="px-8 py-4 bg-[#1A7548] text-white text-lg font-bold rounded-xl shadow-md 
-                       hover:bg-[#155E3A] transition flex items-center justify-center gap-2"
+                       hover:bg-[#155E3A] transition flex items-center justify-center gap-2 cursor-pointer"
           >
             Go to Dashboard <ArrowRight size={18} />
           </button>

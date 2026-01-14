@@ -212,7 +212,7 @@ export default function SchedulePickupPage() {
 
         <button
           onClick={() => router.push("/dashboard")}
-          className="flex items-center gap-2 bg-[#1A7548] text-white px-6 py-2 rounded-full shadow hover:bg-[#155E3A]"
+          className="flex items-center gap-2 bg-[#1A7548] text-white px-6 py-2 rounded-full shadow hover:bg-[#155E3A] cursor-pointer"
         >
           <ArrowLeft size={18} /> Home
         </button>

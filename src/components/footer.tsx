@@ -1,10 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email) return;
+
+    const subject = "Newsletter Subscription - Revive Eco Tech";
+    const body = `Hello Revive Eco Tech Team,
+
+Please add the following email to the newsletter mailing list:
+
+${email}
+
+Thank you.`;
+
+    window.location.href = `mailto:reviveecotech@gmail.com?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+
+    setEmail("");
+  };
+
   return (
     <footer className="flex flex-col font-sans px-4 sm:px-8 xl:px-10 mx-auto mb-8">
       <div className="flex flex-col bg-[#386641] rounded-2xl md:rounded-[4rem] mt-5 pt-10 pb-12 md:pt-20 md:pb-24 px-4 sm:px-8 lg:px-16">
@@ -28,11 +51,7 @@ const Footer = () => {
               Projects
             </Link>
 
-            {/* ✅ LOGIN ADDED */}
-            <Link
-              href="/login"
-              className="text-base text-white font-semibold hover:underline py-1"
-            >
+            <Link href="/login" className="text-base text-white font-semibold hover:underline py-1">
               Login
             </Link>
           </div>
@@ -73,18 +92,28 @@ const Footer = () => {
             </p>
 
             <form
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSubscribe}
               className="flex w-full md:w-auto gap-2"
             >
               <input
-                type="email"
-                placeholder="Enter Email address"
-                className="px-5 py-4 rounded-full bg-[#4d7554] text-white focus:outline-none focus:ring-2 focus:ring-white/20 w-full"
-              />
+  type="email"
+  required
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  placeholder="Enter email address"
+  className="px-5 py-4 rounded-full 
+             bg-[#4d7554] text-white 
+             placeholder:text-white/80
+             border border-white/30
+             focus:outline-none focus:ring-2 focus:ring-white/40 
+             w-full"
+/>
+
+
 
               <button
                 type="submit"
-                className="bg-white text-[#386641] px-5 py-4 rounded-full hover:bg-white/90 hover:text-black transition"
+                className="bg-white text-[#386641] px-6 py-4 rounded-full hover:bg-white/90 hover:text-black transition"
               >
                 Subscribe
               </button>
@@ -103,6 +132,7 @@ const Footer = () => {
             <Link href="/terms" className="hover:underline">
               Terms of Service
             </Link>
+
             <Link href="/privacy" className="hover:underline">
               Privacy Policy
             </Link>

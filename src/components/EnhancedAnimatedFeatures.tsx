@@ -24,14 +24,15 @@ export default function EnhancedAnimatedFeatures() {
       icon: "🤖",
     },
     {
-      id: "real-time",
-      title: "Real-time",
-      description: "Instant analysis and recommendations",
-      color: "#ff8800",
-      bgColor: "bg-orange-100",
-      iconColor: "bg-orange-500",
-      icon: "⚡",
-    },
+  id: "real-time",
+  title: "Real-time",
+  description: "Instant analysis and recommendations",
+  color: "#ff8800",
+  bgColor: "bg-orange-100",
+  iconColor: "bg-orange-500",
+  icon: "⏱️",
+}
+,
     {
       id: "personalized",
       title: "Personalized",

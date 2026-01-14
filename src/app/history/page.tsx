@@ -125,7 +125,7 @@ export default function HistoryPage() {
           <button
             onClick={() => router.push("/dashboard")}
             className="flex items-center gap-2 bg-[#1A7548] px-6 py-2 text-white font-semibold 
-            rounded-full shadow hover:bg-[#155E3A] transition"
+            rounded-full shadow hover:bg-[#155E3A] transition cursor-pointer"
           >
             <ArrowLeft size={18} />
             Back
@@ -143,15 +143,15 @@ export default function HistoryPage() {
         </section>
 
         {/* TABS */}
-        <div className="flex justify-center gap-4 mt-10">
+        <div className="flex justify-center gap-4 mt-10 ">
           {(["upcoming", "past"] as const).map((key) => (
             <button
               key={key}
               onClick={() => setTab(key)}
               className={`px-8 py-3 rounded-xl text-lg font-semibold transition ${
                 tab === key
-                  ? "bg-[#1A7548] text-white shadow-lg"
-                  : "bg-white text-[#1A7548] border border-[#1A7548] hover:bg-[#EAF3ED]"
+                  ? "bg-[#1A7548] text-white shadow-lg cursor-pointer"
+                  : "bg-white text-[#1A7548] border border-[#1A7548] hover:bg-[#EAF3ED] cursor-pointer"
               }`}
             >
               {key === "upcoming" ? "Upcoming" : "Past"}
@@ -204,14 +204,6 @@ export default function HistoryPage() {
         </section>
       </div>
 
-      {/* ---------- FOOTER ---------- */}
-      <footer className="w-full flex justify-center py-8 px-4 mt-10">
-        <div className="bg-[#2F5E3A] rounded-full px-12 py-4 shadow-lg">
-          <p className="text-white text-sm font-medium tracking-wide">
-            © {new Date().getFullYear()} Revive Ecotech Ltd
-          </p>
-        </div>
-      </footer>
     </main>
   );
 }

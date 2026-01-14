@@ -24,14 +24,15 @@ export default function CSSAnimatedFeatures() {
       icon: "🤖",
     },
     {
-      id: "real-time",
-      title: "Real-time",
-      description: "Instant tracking, pickup updates, and digital documentation.",
-      color: "#ff8800",
-      bgColor: "bg-orange-100",
-      iconColor: "bg-orange-500",
-      icon: "⚡",
-    },
+  id: "real-time",
+  title: "Real-time",
+  description: "Instant tracking, pickup updates, and digital documentation.",
+  bgColor: "bg-orange-50",
+  iconColor: "bg-orange-500",
+  icon: "⏱️",
+}
+
+,
     {
       id: "personalized",
       title: "Transparent",

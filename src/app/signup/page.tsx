@@ -135,7 +135,7 @@ export default function SignupPage() {
           <button
             onClick={() => router.push("/")}
             className="px-4 py-2 flex items-center gap-2 rounded-full border 
-            text-[#253612] hover:bg-[#eef3eb] transition"
+            text-[#253612] hover:bg-[#eef3eb] transition  cursor-pointer"
           >
             <Home size={16} /> Home
           </button>
@@ -143,7 +143,7 @@ export default function SignupPage() {
           <button
             onClick={() => router.push("/login")}
             className="px-4 py-2 flex items-center gap-2 rounded-full border 
-            text-[#253612] hover:bg-[#eef3eb] transition"
+            text-[#253612] hover:bg-[#eef3eb] transition  cursor-pointer"
           >
             <LogIn size={16} /> Log In
           </button>
@@ -167,8 +167,8 @@ export default function SignupPage() {
             onClick={() => setMode("email")}
             className={`px-4 py-2 rounded-full border ${
               mode === "email"
-                ? "bg-[#253612] text-white"
-                : "bg-white text-[#253612]"
+                ? "bg-[#253612] text-white  cursor-pointer"
+                : "bg-white text-[#253612]  cursor-pointer"
             }`}
           >
             Email
@@ -178,8 +178,8 @@ export default function SignupPage() {
             onClick={() => setMode("phone")}
             className={`px-4 py-2 rounded-full border ${
               mode === "phone"
-                ? "bg-[#253612] text-white"
-                : "bg-white text-[#253612]"
+                ? "bg-[#253612] text-white  cursor-pointer"
+                : "bg-white text-[#253612]  cursor-pointer"
             }`}
           >
             Phone
@@ -237,7 +237,7 @@ export default function SignupPage() {
             {/* Create Account */}
             <button
               onClick={signupEmail}
-              className="w-full py-3 rounded-xl bg-[#253612] text-white font-semibold hover:bg-[#1c2a0e] transition"
+              className="w-full py-3 rounded-xl bg-[#253612] text-white font-semibold hover:bg-[#1c2a0e] transition cursor-pointer"
             >
               Create Account
             </button>
@@ -270,7 +270,7 @@ export default function SignupPage() {
             {!otpSent && (
               <button
                 onClick={sendOtp}
-                className="w-full py-3 rounded-xl bg-[#253612] text-white font-semibold hover:bg-[#1c2a0e]"
+                className="w-full py-3 rounded-xl bg-[#253612] text-white font-semibold hover:bg-[#1c2a0e] cursor-pointer"
               >
                 Send OTP
               </button>
@@ -317,7 +317,7 @@ export default function SignupPage() {
             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.79l-7.63-5.93c-2.11 1.42-4.83 2.27-8.27 2.27-6.26 0-11.47-4.03-13.46-9.61l-7.98 6.19C6.51 42.58 14.63 48 24 48z" />
           </svg>
 
-          <span className="text-[#253612] font-medium">
+          <span className="text-[#253612] font-medium  cursor-pointer">
             Continue with Google
           </span>
         </button>

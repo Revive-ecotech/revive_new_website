@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link"; // ✅ REQUIRED
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { useEffect, useState } from "react";
+
 
 import { Power, Package, Clock, Tags, HelpCircle } from "lucide-react";
 import { getUserProfile } from "@/lib/firebase";
@@ -53,7 +55,7 @@ export default function DashboardPage() {
       <div className="flex-grow">
         
         {/* TOP NAV BAR */}
-        <header className="w-full bg-white px-6 py-4 shadow-sm flex justify-between items-center border-b border-[#DDECE2]">
+        <header className="w-full bg-white px-6 py-4 shadow-sm flex justify-between items-center border-b border-[#DDECE2] ">
           <Image
             src="/logo2.png"
             alt="Revive"
@@ -66,7 +68,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push("/help-support")}
-              className="p-2 bg-[#1A7548] hover:bg-[#155E3A] transition rounded-full shadow"
+              className="p-2 bg-[#1A7548] hover:bg-[#155E3A] transition rounded-full shadow cursor-pointer"
               title="Help & Support"
             >
               <HelpCircle size={22} className="text-white" />
@@ -74,7 +76,7 @@ export default function DashboardPage() {
 
             <button
               onClick={handleLogout}
-              className="p-2 bg-[#1A7548] hover:bg-[#155E3A] transition rounded-full shadow"
+              className="p-2 bg-[#1A7548] hover:bg-[#155E3A] transition rounded-full shadow cursor-pointer"
               title="Logout"
             >
               <Power size={22} className="text-white" />
@@ -184,15 +186,57 @@ export default function DashboardPage() {
           </div>
         </section>
       </div>
+{/* SOFT SPACING / FADE */}
+<div className="h-24 bg-gradient-to-b from-transparent to-[#E8F1EA]" />
 
-      {/* ---------- FOOTER ---------- */}
-      <footer className="w-full flex justify-center pb-6 px-4 mt-12">
-        <div className="w-full max-w-6xl bg-[#2F5E3A] rounded-full py-5 shadow-lg flex justify-center">
-          <p className="text-white text-sm font-medium tracking-wide">
-            © {new Date().getFullYear()} Revive Ecotech Ltd
-          </p>
+{/* ---------- FOOTER ---------- */}
+<footer className="w-full px-4 sm:px-6 pb-8">
+  <div className="max-w-7xl mx-auto">
+    <div className="bg-[#2F5E3A] rounded-3xl px-6 py-6 shadow-lg">
+
+      {/* TOP ROW */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+
+        {/* LEFT: LOGO */}
+        <div className="flex items-center gap-3">
+          <Image
+            src="/logo2.png"
+            alt="Revive"
+            width={110}
+            height={40}
+            className="object-contain"
+          />
         </div>
-      </footer>
+
+        {/* RIGHT: LINKS */}
+        <div className="flex gap-6 text-sm text-white">
+          <Link
+            href="/terms"
+            className="hover:underline underline-offset-4 transition cursor-pointer"
+          >
+            Terms
+          </Link>
+          <Link
+            href="/privacy"
+            className="hover:underline underline-offset-4 transition cursor-pointer"
+          >
+            Privacy
+          </Link>
+        </div>
+      </div>
+
+      {/* DIVIDER */}
+      <div className="h-px bg-white/20 my-4" />
+
+      {/* BOTTOM */}
+      <div className="flex justify-center text-xs text-white/70">
+        <p>© {new Date().getFullYear()} Revive Ecotech Ltd</p>
+      </div>
+
+    </div>
+  </div>
+</footer>
+
     </main>
   );
 }

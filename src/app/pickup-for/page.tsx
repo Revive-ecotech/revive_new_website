@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Users, User } from "lucide-react";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 
 export default function PickupForPage() {
   const router = useRouter();
@@ -22,11 +23,11 @@ export default function PickupForPage() {
         />
 
         <button
-          onClick={() => router.back()}
-          className="px-5 py-2 bg-[#1A7548] text-white rounded-full hover:bg-[#155E3A] transition shadow"
-        >
-          ← Back
-        </button>
+            onClick={() => router.back()}
+            className="flex items-center gap-2 bg-[#1A7548] text-white px-6 py-2 rounded-full shadow hover:bg-[#155E3A] transition cursor-pointer"
+          >
+            <ArrowLeft size={18} /> Back
+          </button>
       </header>
 
       {/* CONTENT */}
@@ -94,14 +95,6 @@ export default function PickupForPage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="w-full flex justify-center pb-6 px-4">
-        <div className="w-full max-w-6xl bg-[#2F5E3A] rounded-full py-5 shadow-lg flex justify-center">
-          <p className="text-white text-sm font-medium tracking-wide">
-            © {new Date().getFullYear()} Revive Ecotech Ltd
-          </p>
-        </div>
-      </footer>
     </main>
   );
 }
